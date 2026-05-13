@@ -495,7 +495,7 @@ document.querySelector('#btn-bot').addEventListener('click', async () => {
         formData.append("plataforma", plataforma);
         formData.append("mensagem", mensagem);
 
-        const response = await fetch('/executar-bot', {
+        const response = await fetch('https://portfolio-automacoes.onrender.com/executar-bot', {
             method: 'POST',
             body: formData
         });
@@ -589,7 +589,7 @@ if (!email || !nome) {
 
     return;
 }
-        const response = await fetch("/executar", {
+        const response = await fetch("https://portfolio-automacoes.onrender.com/executar", {
             method: "POST",
             body: formData
         });
