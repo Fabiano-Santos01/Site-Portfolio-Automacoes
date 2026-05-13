@@ -1,5 +1,7 @@
 import os
+
 from flask_cors import CORS
+
 from flask import (
     Flask,
     render_template,
@@ -37,7 +39,12 @@ load_dotenv()
 # CONFIG FLASK
 # ==========================================
 
-app = Flask(__name__, template_folder='.', static_url_path='', static_folder='.')
+app = Flask(
+    __name__,
+    template_folder='.',
+    static_url_path='',
+    static_folder='.'
+)
 
 CORS(app)
 
@@ -47,18 +54,26 @@ CORS(app)
 
 @app.route('/')
 def home():
-    return render_template('index.html')
+
+    return render_template(
+        'index.html'
+    )
 
 
 @app.route('/projetos')
 def projetos():
-    return render_template('projetos.html')
+
+    return render_template(
+        'projetos.html'
+    )
 
 
 @app.route('/automacoes')
 def automacoes():
-    return render_template('automacoes.html')
 
+    return render_template(
+        'automacoes.html'
+    )
 
 # ==========================================
 # EXECUTAR AUTOMAÇÃO
@@ -69,12 +84,24 @@ def executar():
 
     try:
 
-        email = request.form.get('email')
-        nome = request.form.get('nome', 'Dev')
-        api_url = request.form.get('api_url')
+        email = request.form.get(
+            'email'
+        )
+
+        nome = request.form.get(
+            'nome',
+            'Dev'
+        )
+
+        api_url = request.form.get(
+            'api_url'
+        )
 
         quantidade = int(
-            request.form.get('quantidade', 10)
+            request.form.get(
+                'quantidade',
+                10
+            )
         )
 
         # ==================================
@@ -82,19 +109,25 @@ def executar():
         # ==================================
 
         if not email:
+
             return jsonify({
                 "status": "erro",
-                "mensagem": "E-mail obrigatório."
-            })
+                "mensagem": (
+                    "E-mail obrigatório."
+                )
+            }), 400
 
         if not nome:
+
             return jsonify({
                 "status": "erro",
-                "mensagem": "Nome obrigatório."
-            })
+                "mensagem": (
+                    "Nome obrigatório."
+                )
+            }), 400
 
         # ==================================
-        # GERAR CSV FAKE
+        # GERAR CSV
         # ==================================
 
         gerar_dados_falsos_csv(
@@ -106,10 +139,12 @@ def executar():
         )
 
         # ==================================
-        # MENSAGEM EMAIL
+        # GERAR MENSAGEM
         # ==================================
 
-        mensagem = gerar_mensagem(nome)
+        mensagem = gerar_mensagem(
+            nome
+        )
 
         # ==================================
         # PROCESSAR API
@@ -121,7 +156,9 @@ def executar():
         if api_url:
 
             arquivo_processado, dados = (
-                processar_api(api_url)
+                processar_api(
+                    api_url
+                )
             )
 
         # ==================================
@@ -145,8 +182,26 @@ def executar():
             dados=dados
         )
 
+        print(
+            f"[EMAIL RESULTADO] {resultado_email}"
+        )
+
         # ==================================
-        # RESPOSTA
+        # VALIDAR RESULTADO
+        # ==================================
+
+        if (
+            not resultado_email
+            or "Erro" in resultado_email
+        ):
+
+            return jsonify({
+                "status": "erro",
+                "mensagem": resultado_email
+            }), 500
+
+        # ==================================
+        # SUCESSO
         # ==================================
 
         return jsonify({
@@ -161,15 +216,18 @@ def executar():
             "mensagem": (
                 "Quantidade inválida."
             )
-        })
+        }), 400
 
     except Exception as erro:
+
+        print(
+            f"[ERRO EXECUTAR] {erro}"
+        )
 
         return jsonify({
             "status": "erro",
             "mensagem": str(erro)
-        })
-
+        }), 500
 
 # ==========================================
 # BOT SOCIAL
@@ -199,7 +257,7 @@ def executar_bot():
                 "mensagem": (
                     "Escolha uma plataforma."
                 )
-            })
+            }), 400
 
         if not mensagem:
 
@@ -208,7 +266,7 @@ def executar_bot():
                 "mensagem": (
                     "Digite uma mensagem."
                 )
-            })
+            }), 400
 
         # ==================================
         # EXECUTAR ENVIO
@@ -219,6 +277,28 @@ def executar_bot():
             mensagem
         )
 
+        print(
+            f"[BOT RESULTADO] {resultado}"
+        )
+
+        # ==================================
+        # VALIDAR RESULTADO
+        # ==================================
+
+        if (
+            not resultado
+            or "Erro" in resultado
+        ):
+
+            return jsonify({
+                "status": "erro",
+                "mensagem": resultado
+            }), 500
+
+        # ==================================
+        # SUCESSO
+        # ==================================
+
         return jsonify({
             "status": "sucesso",
             "mensagem": resultado
@@ -226,11 +306,14 @@ def executar_bot():
 
     except Exception as erro:
 
+        print(
+            f"[ERRO BOT] {erro}"
+        )
+
         return jsonify({
             "status": "erro",
             "mensagem": str(erro)
-        })
-
+        }), 500
 
 # ==========================================
 # DOWNLOAD CSV
@@ -252,13 +335,12 @@ def download():
             "mensagem": (
                 "Arquivo não encontrado."
             )
-        })
+        }), 404
 
     return send_file(
         nome_arquivo,
         as_attachment=True
     )
-
 
 # ==========================================
 # START FLASK
