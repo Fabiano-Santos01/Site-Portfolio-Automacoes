@@ -58,6 +58,7 @@ Automação • Integração • Soluções Inteligentes
 # ==========================================
 
 def gerar_relatorio_html(dados):
+
     if not dados:
         return "<h2>Nenhum dado encontrado.</h2>"
 
@@ -132,13 +133,20 @@ def anexar_arquivo(msg, caminho_arquivo):
 
         with open(caminho_arquivo, "rb") as arquivo:
 
-            parte = MIMEBase("application", "octet-stream")
+            parte = MIMEBase(
+                "application",
+                "octet-stream"
+            )
 
-            parte.set_payload(arquivo.read())
+            parte.set_payload(
+                arquivo.read()
+            )
 
             encoders.encode_base64(parte)
 
-            nome_arquivo = os.path.basename(caminho_arquivo)
+            nome_arquivo = os.path.basename(
+                caminho_arquivo
+            )
 
             parte.add_header(
                 "Content-Disposition",
@@ -148,6 +156,7 @@ def anexar_arquivo(msg, caminho_arquivo):
             msg.attach(parte)
 
     except Exception as erro:
+
         print(f"[ERRO ANEXO] {erro}")
 
 
@@ -163,11 +172,13 @@ def enviar_email(
 ):
 
     if not EMAIL_SENHA:
+
         raise Exception(
-            "EMAIL_SENHA não encontrada no .env"
+            "EMAIL_SENHA não encontrada."
         )
 
     if not destinatario:
+
         raise Exception(
             "Destinatário inválido."
         )
@@ -181,67 +192,101 @@ def enviar_email(
         msg["Subject"] = "🚀 Automação Executada"
 
         # ==================================
-        # TEXTO PADRÃO
+        # TEXTO
         # ==================================
 
         if mensagem:
 
             msg.attach(
-                MIMEText(mensagem, "plain", "utf-8")
+                MIMEText(
+                    mensagem,
+                    "plain",
+                    "utf-8"
+                )
             )
 
         # ==================================
-        # HTML RELATÓRIO
+        # HTML
         # ==================================
 
         if dados:
 
-            html = gerar_relatorio_html(dados)
+            html = gerar_relatorio_html(
+                dados
+            )
 
             msg.attach(
-                MIMEText(html, "html", "utf-8")
+                MIMEText(
+                    html,
+                    "html",
+                    "utf-8"
+                )
             )
 
         # ==================================
         # ANEXO
         # ==================================
 
-        anexar_arquivo(msg, anexo)
+        anexar_arquivo(
+            msg,
+            anexo
+        )
 
         # ==================================
         # SMTP
         # ==================================
 
-        server = smtplib.SMTP(
-            SMTP_SERVER,
-            SMTP_PORT
-        )
+        try:
 
-        server.starttls()
+            server = smtplib.SMTP(
+                SMTP_SERVER,
+                SMTP_PORT,
+                timeout=15
+            )
 
-        server.login(
-            REMETENTE,
-            EMAIL_SENHA
-        )
+            server.ehlo()
 
-        server.sendmail(
-            REMETENTE,
-            destinatario,
-            msg.as_string()
-        )
+            server.starttls()
 
-        server.quit()
+            server.ehlo()
 
-        return "E-mail enviado com sucesso 🚀"
+            server.login(
+                REMETENTE,
+                EMAIL_SENHA
+            )
 
-    except smtplib.SMTPAuthenticationError:
-        return (
-            "Erro de autenticação no Gmail. "
-            "Verifique EMAIL_SENHA."
-        )
+            server.sendmail(
+                REMETENTE,
+                destinatario,
+                msg.as_string()
+            )
 
-    except smtplib.SMTPException as erro:
-        return f"Erro SMTP: {erro}"
+            server.quit()
+
+            print(
+                "[EMAIL] enviado com sucesso."
+            )
+
+            return (
+                "E-mail enviado com sucesso 🚀"
+            )
+
+        except Exception as erro_smtp:
+
+            print(
+                f"[ERRO SMTP] {erro_smtp}"
+            )
+
+            return (
+                f"Erro SMTP: {erro_smtp}"
+            )
 
     except Exception as erro:
-        return f"Erro ao enviar email: {erro}"
+
+        print(
+            f"[ERRO EMAIL] {erro}"
+        )
+
+        return (
+            f"Erro ao enviar email: {erro}"
+        )
