@@ -1,5 +1,5 @@
 import os
-
+from flask_cors import CORS
 from flask import (
     Flask,
     render_template,
@@ -37,12 +37,9 @@ load_dotenv()
 # CONFIG FLASK
 # ==========================================
 
-app = Flask(
-    __name__,
-    template_folder='.',
-    static_url_path='',
-    static_folder='.'
-)
+app = Flask(__name__, template_folder='.', static_url_path='', static_folder='.')
+
+CORS(app)
 
 # ==========================================
 # ROTAS PRINCIPAIS
