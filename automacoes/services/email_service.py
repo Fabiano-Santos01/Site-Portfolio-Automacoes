@@ -124,7 +124,7 @@ def enviar_email(destinatario, mensagem, anexo=None, dados=None):
     try:
 
         params = {
-            "from": "Fabiano <onboarding@resend.dev>",
+            "from": "Fabiano <contato@fabiano.tec.br>",
             "to": [destinatario],
             "subject": "Automação executada com sucesso",
             "html": f"""
