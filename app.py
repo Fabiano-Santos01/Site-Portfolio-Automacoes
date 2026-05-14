@@ -12,20 +12,20 @@ from flask import (
 
 from dotenv import load_dotenv
 
-from automações.main_unificado import (
+from automacoes.main_unificado import (
     gerar_dados_falsos_csv
 )
 
-from automações.services.email_service import (
+from automacoes.services.email_service import (
     enviar_email,
     gerar_mensagem
 )
 
-from automações.services.api_service import (
+from automacoes.services.api_service import (
     processar_api
 )
 
-from automações.services.roteiro_de_envio import (
+from automacoes.services.roteiro_de_envio import (
     enviar_para_rede
 )
 
@@ -341,6 +341,59 @@ def download():
         nome_arquivo,
         as_attachment=True
     )
+
+# ==========================================
+# GERAR DADOS
+# ==========================================
+
+@app.route('/gerar-dados', methods=['POST'])
+def gerar_dados():
+
+    try:
+
+        quantidade = int(
+            request.form.get(
+                'quantidade',
+                10
+            )
+        )
+
+        # ==================================
+        # GERAR CSV
+        # ==================================
+
+        gerar_dados_falsos_csv(
+            quantidade
+        )
+
+        # ==================================
+        # RETORNAR ARQUIVO
+        # ==================================
+
+        return send_file(
+            'dados_falsos_organizados.csv',
+            as_attachment=True
+        )
+
+    except ValueError:
+
+        return jsonify({
+            "status": "erro",
+            "mensagem": (
+                "Quantidade inválida."
+            )
+        }), 400
+
+    except Exception as erro:
+
+        print(
+            f"[ERRO GERAR DADOS] {erro}"
+        )
+
+        return jsonify({
+            "status": "erro",
+            "mensagem": str(erro)
+        }), 500
 
 # ==========================================
 # START FLASK

@@ -594,12 +594,18 @@ if (!email || !nome) {
             body: formData
         });
 
-        // ⚠️ garante que resposta veio válida
-        if (!response.ok) {
-            throw new Error("Erro no servidor");
-        }
+        // 🔥 tenta pegar resposta do backend
+        const data = await response.json().catch(() => ({}));
 
-        const data = await response.json();
+        // 🔥 mostra erro REAL do Flask
+        if (!response.ok) {
+
+            console.error("ERRO BACKEND:", data);
+
+            throw new Error(
+                data.mensagem || "Erro no servidor"
+            );
+        }
 
         if (data.status === "sucesso") {
 

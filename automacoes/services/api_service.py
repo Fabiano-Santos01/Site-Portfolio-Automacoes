@@ -2,7 +2,7 @@ import csv
 import random
 import requests
 
-from automações.services.data_formatter import formatar_dados
+from automacoes.services.data_formatter import formatar_dados
 
 
 # ==========================================
