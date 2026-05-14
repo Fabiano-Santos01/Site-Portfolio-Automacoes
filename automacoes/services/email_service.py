@@ -1,4 +1,7 @@
 import os
+import base64
+import mimetypes
+import html as html_lib
 import resend
 
 from dotenv import load_dotenv
@@ -11,6 +14,21 @@ from dotenv import load_dotenv
 load_dotenv()
 
 resend.api_key = os.getenv("RESEND_API_KEY")
+
+
+# ==========================================
+# AUXILIAR: LINK OU TEXTO
+# ==========================================
+
+def _link_ou_texto(valor):
+
+    texto = html_lib.escape(str(valor))
+
+    if isinstance(valor, str) and valor.startswith(("http://", "https://")):
+
+        return f'<a href="{texto}" target="_blank" style="color:#60a5fa;text-decoration:underline;">{texto}</a>'
+
+    return texto
 
 
 # ==========================================
@@ -51,54 +69,35 @@ Automação • Integração • Soluções Inteligentes
 def gerar_relatorio_html(dados):
 
     if not dados:
-        return "<h2>Nenhum dado encontrado.</h2>"
+
+        return "<h2 style='font-family:Arial;'>Nenhum dado encontrado.</h2>"
 
     html = """
-    <div style="
-        font-family: Arial, sans-serif;
-        background: #0f172a;
-        color: white;
-        padding: 25px;
-        border-radius: 12px;
-    ">
-        <h2 style="color:#8b5cf6;">
-            🚀 Relatório Automático
-        </h2>
-
-        <hr style="border:1px solid #334155;">
+    <div style="font-family:Arial,sans-serif;background:#0f172a;color:#fff;padding:24px;border-radius:14px;">
+        <h2 style="color:#8b5cf6;margin-bottom:16px;">🚀 Relatório Automático</h2>
     """
 
-    for item in dados:
+    for idx, item in enumerate(dados, 1):
 
-        html += """
-        <div style="
-            background:#111827;
-            padding:15px;
-            margin-bottom:15px;
-            border-radius:10px;
-            border-top:4px solid #8b5cf6;
-        ">
+        html += f"""
+        <div style="background:#111827;padding:16px;margin-bottom:16px;border-radius:12px;border-top:4px solid #8b5cf6;">
+            <div style="font-weight:bold;color:#a78bfa;margin-bottom:10px;">Registro {idx}</div>
+            <table style="width:100%;border-collapse:collapse;">
         """
 
         for chave, valor in item.items():
 
             html += f"""
-            <p style="margin:8px 0;">
-                <strong style="color:#a78bfa;">
-                    {chave}:
-                </strong>
-                {valor}
-            </p>
+                <tr>
+                    <td style="padding:8px;border-bottom:1px solid #334155;color:#cbd5e1;font-weight:bold;width:180px;">{html_lib.escape(str(chave))}</td>
+                    <td style="padding:8px;border-bottom:1px solid #334155;color:#e2e8f0;">{_link_ou_texto(valor)}</td>
+                </tr>
             """
 
-        html += "</div>"
+        html += "</table></div>"
 
     html += """
-        <p style="
-            margin-top:20px;
-            color:#94a3b8;
-            font-size:14px;
-        ">
+        <p style="margin-top:20px;color:#94a3b8;font-size:14px;">
             Relatório gerado automaticamente pelo sistema de automações.
         </p>
     </div>
@@ -108,34 +107,56 @@ def gerar_relatorio_html(dados):
 
 
 # ==========================================
-# ANEXAR ARQUIVO
+# MONTAR ANEXOS
 # ==========================================
 
-# Nota: A API Resend será atualizada para suportar anexos em breve
-# Por enquanto, apenas texto e HTML são suportados
+def _montar_attachments(caminho_arquivo):
+
+    if not caminho_arquivo or not os.path.exists(caminho_arquivo):
+
+        return []
+
+    mime_type, _ = mimetypes.guess_type(caminho_arquivo)
+
+    with open(caminho_arquivo, "rb") as f:
+
+        content_b64 = base64.b64encode(f.read()).decode("utf-8")
+
+    return [{
+        "filename": os.path.basename(caminho_arquivo),
+        "content": content_b64
+    }]
 
 
 # ==========================================
 # ENVIAR EMAIL
 # ==========================================
 
-def enviar_email(destinatario, mensagem, anexo=None, dados=None):
+def enviar_email(destinatario, mensagem=None, anexo=None, dados=None):
+
+    if not os.getenv("RESEND_API_KEY"):
+
+        return "Erro: RESEND_API_KEY não encontrada."
 
     try:
 
         params = {
             "from": "Fabiano <contato@fabiano.tec.br>",
             "to": [destinatario],
-            "subject": "Automação executada com sucesso",
-            "html": f"""
-                <h2>Olá!</h2>
-                <p>{mensagem}</p>
-            """
+            "subject": "🚀 Automação Executada",
+            "text": mensagem or "",
+            "html": gerar_relatorio_html(dados) if dados else f"<p>{html_lib.escape(mensagem or '')}</p>",
         }
+
+        attachments = _montar_attachments(anexo)
+
+        if attachments:
+
+            params["attachments"] = attachments
 
         resend.Emails.send(params)
 
-        return "Email enviado com sucesso 🚀"
+        return "E-mail enviado com sucesso 🚀"
 
     except Exception as erro:
 

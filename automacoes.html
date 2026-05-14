@@ -234,6 +234,20 @@
 
             <input
                 type="text"
+                name="bot_nome"
+                placeholder="Seu nome (opcional)"
+                class="w-full p-2.5 rounded-lg bg-white dark:bg-white text-gray-900 border border-gray-300 text-sm shadow-sm"
+            />
+
+            <input
+                type="email"
+                name="bot_email"
+                placeholder="Seu e-mail (opcional)"
+                class="w-full p-2.5 rounded-lg bg-white dark:bg-white text-gray-900 border border-gray-300 text-sm shadow-sm"
+            />
+
+            <input
+                type="text"
                 id="bot-msg"
                 placeholder="Mensagem personalizada"
                 class="w-full p-2.5 rounded-lg bg-white dark:bg-white text-gray-900 border border-gray-300 text-sm shadow-sm"
@@ -471,6 +485,10 @@ document.querySelector('#btn-bot').addEventListener('click', async () => {
     const plataforma = document.querySelector('select[name="plataforma"]').value;
     const mensagem = document.querySelector('#bot-msg').value;
 
+    // NOVOS CAMPOS
+    const nomeBot = document.querySelector('input[name="bot_nome"]').value.trim();
+    const emailBot = document.querySelector('input[name="bot_email"]').value.trim();
+
     const btnBot = document.getElementById("btn-bot");
     const btnTextBot = document.getElementById("bot-btn-text");
     const btnLoadingBot = document.getElementById("bot-btn-loading");
@@ -494,6 +512,10 @@ document.querySelector('#btn-bot').addEventListener('click', async () => {
 
         formData.append("plataforma", plataforma);
         formData.append("mensagem", mensagem);
+
+        // NOVOS DADOS
+        formData.append("nome", nomeBot);
+        formData.append("email", emailBot);
 
         const response = await fetch('https://portfolio-automacoes.onrender.com/executar-bot', {
             method: 'POST',

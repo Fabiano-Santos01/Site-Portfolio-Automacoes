@@ -1,5 +1,7 @@
 import os
 
+from datetime import datetime
+
 from flask_cors import CORS
 
 from flask import (
@@ -127,16 +129,14 @@ def executar():
             }), 400
 
         # ==================================
-        # GERAR CSV
+        # GERAR CSV E XLSX
         # ==================================
 
-        gerar_dados_falsos_csv(
+        arquivo_csv, arquivo_xlsx = gerar_dados_falsos_csv(
             quantidade
         )
 
-        arquivo_fake = (
-            'dados_falsos_organizados.csv'
-        )
+        arquivo_fake = arquivo_xlsx
 
         # ==================================
         # GERAR MENSAGEM
@@ -246,6 +246,34 @@ def executar_bot():
             "mensagem"
         )
 
+        nome = request.form.get(
+            "nome",
+            ""
+        ).strip() or "Não informado"
+
+        email = request.form.get(
+            "email",
+            ""
+        ).strip() or "Não informado"
+
+        # ==================================
+        # CAPTURAR INFORMAÇÕES DO REQUEST
+        # ==================================
+
+        ip = request.headers.get(
+            "X-Forwarded-For",
+            request.remote_addr or "desconhecido"
+        )
+
+        user_agent = request.headers.get(
+            "User-Agent",
+            "desconhecido"
+        )
+
+        agora = datetime.now().strftime(
+            "%d/%m/%Y %H:%M:%S"
+        )
+
         # ==================================
         # VALIDAÇÕES
         # ==================================
@@ -269,12 +297,26 @@ def executar_bot():
             }), 400
 
         # ==================================
+        # MONTAR MENSAGEM IDENTIFICADA
+        # ==================================
+
+        mensagem_identificada = (
+            f"🧾 Nova solicitação do site\n"
+            f"Nome: {nome}\n"
+            f"E-mail: {email}\n"
+            f"IP: {ip}\n"
+            f"User-Agent: {user_agent}\n"
+            f"Data: {agora}\n\n"
+            f"Mensagem:\n{mensagem}"
+        )
+
+        # ==================================
         # EXECUTAR ENVIO
         # ==================================
 
         resultado = enviar_para_rede(
             tipo,
-            mensagem
+            mensagem_identificada
         )
 
         print(
@@ -323,7 +365,7 @@ def executar_bot():
 def download():
 
     nome_arquivo = (
-        'dados_falsos_organizados.csv'
+        'dados_falsos_organizados.xlsx'
     )
 
     if not os.path.exists(
@@ -371,7 +413,7 @@ def gerar_dados():
         # ==================================
 
         return send_file(
-            'dados_falsos_organizados.csv',
+            'dados_falsos_organizados.xlsx',
             as_attachment=True
         )
 
