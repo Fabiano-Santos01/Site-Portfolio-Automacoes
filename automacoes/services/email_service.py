@@ -1,12 +1,7 @@
 import os
-import smtplib
+import resend
 
 from dotenv import load_dotenv
-
-from email.mime.text import MIMEText
-from email.mime.base import MIMEBase
-from email.mime.multipart import MIMEMultipart
-from email import encoders
 
 
 # ==========================================
@@ -15,11 +10,7 @@ from email import encoders
 
 load_dotenv()
 
-SMTP_SERVER = "smtp.gmail.com"
-SMTP_PORT = 587
-
-REMETENTE = "bido2502@gmail.com"
-EMAIL_SENHA = os.getenv("EMAIL_SENHA")
+resend.api_key = os.getenv("RESEND_API_KEY")
 
 
 # ==========================================
@@ -120,173 +111,32 @@ def gerar_relatorio_html(dados):
 # ANEXAR ARQUIVO
 # ==========================================
 
-def anexar_arquivo(msg, caminho_arquivo):
-
-    if not caminho_arquivo:
-        return
-
-    if not os.path.exists(caminho_arquivo):
-        print(f"[ERRO] Arquivo não encontrado: {caminho_arquivo}")
-        return
-
-    try:
-
-        with open(caminho_arquivo, "rb") as arquivo:
-
-            parte = MIMEBase(
-                "application",
-                "octet-stream"
-            )
-
-            parte.set_payload(
-                arquivo.read()
-            )
-
-            encoders.encode_base64(parte)
-
-            nome_arquivo = os.path.basename(
-                caminho_arquivo
-            )
-
-            parte.add_header(
-                "Content-Disposition",
-                f"attachment; filename={nome_arquivo}"
-            )
-
-            msg.attach(parte)
-
-    except Exception as erro:
-
-        print(f"[ERRO ANEXO] {erro}")
+# Nota: A API Resend será atualizada para suportar anexos em breve
+# Por enquanto, apenas texto e HTML são suportados
 
 
 # ==========================================
 # ENVIAR EMAIL
 # ==========================================
 
-def enviar_email(
-    destinatario,
-    mensagem=None,
-    anexo=None,
-    dados=None
-):
-
-    if not EMAIL_SENHA:
-
-        raise Exception(
-            "EMAIL_SENHA não encontrada."
-        )
-
-    if not destinatario:
-
-        raise Exception(
-            "Destinatário inválido."
-        )
+def enviar_email(destinatario, mensagem, anexo=None, dados=None):
 
     try:
 
-        msg = MIMEMultipart()
+        params = {
+            "from": "Fabiano <onboarding@resend.dev>",
+            "to": [destinatario],
+            "subject": "Automação executada com sucesso",
+            "html": f"""
+                <h2>Olá!</h2>
+                <p>{mensagem}</p>
+            """
+        }
 
-        msg["From"] = REMETENTE
-        msg["To"] = destinatario
-        msg["Subject"] = "🚀 Automação Executada"
+        resend.Emails.send(params)
 
-        # ==================================
-        # TEXTO
-        # ==================================
-
-        if mensagem:
-
-            msg.attach(
-                MIMEText(
-                    mensagem,
-                    "plain",
-                    "utf-8"
-                )
-            )
-
-        # ==================================
-        # HTML
-        # ==================================
-
-        if dados:
-
-            html = gerar_relatorio_html(
-                dados
-            )
-
-            msg.attach(
-                MIMEText(
-                    html,
-                    "html",
-                    "utf-8"
-                )
-            )
-
-        # ==================================
-        # ANEXO
-        # ==================================
-
-        anexar_arquivo(
-            msg,
-            anexo
-        )
-
-        # ==================================
-        # SMTP
-        # ==================================
-
-        try:
-
-            server = smtplib.SMTP(
-                SMTP_SERVER,
-                SMTP_PORT,
-                timeout=15
-            )
-
-            server.ehlo()
-
-            server.starttls()
-
-            server.ehlo()
-
-            server.login(
-                REMETENTE,
-                EMAIL_SENHA
-            )
-
-            server.sendmail(
-                REMETENTE,
-                destinatario,
-                msg.as_string()
-            )
-
-            server.quit()
-
-            print(
-                "[EMAIL] enviado com sucesso."
-            )
-
-            return (
-                "E-mail enviado com sucesso 🚀"
-            )
-
-        except Exception as erro_smtp:
-
-            print(
-                f"[ERRO SMTP] {erro_smtp}"
-            )
-
-            return (
-                f"Erro SMTP: {erro_smtp}"
-            )
+        return "Email enviado com sucesso 🚀"
 
     except Exception as erro:
 
-        print(
-            f"[ERRO EMAIL] {erro}"
-        )
-
-        return (
-            f"Erro ao enviar email: {erro}"
-        )
+        return f"Erro Email API: {erro}"
