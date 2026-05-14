@@ -162,6 +162,28 @@ def executar():
             )
 
         # ==================================
+        # DETECTAR TIPO DE API
+        # ==================================
+
+        tipo_api = "default"
+
+        if api_url:
+
+            url_lower = api_url.lower()
+
+            if "coingecko" in url_lower:
+
+                tipo_api = "crypto"
+
+            elif "ibge" in url_lower:
+
+                tipo_api = "ibge"
+
+            elif "picsum" in url_lower:
+
+                tipo_api = "imagem"
+
+        # ==================================
         # DEFINIR ANEXO
         # ==================================
 
@@ -179,7 +201,9 @@ def executar():
             destinatario=email,
             mensagem=mensagem,
             anexo=anexo,
-            dados=dados
+            dados=dados,
+            tipo_api=tipo_api,
+            nome_usuario=nome
         )
 
         print(

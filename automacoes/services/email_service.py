@@ -32,8 +32,41 @@ def _link_ou_texto(valor):
 
 
 # ==========================================
-# GERAR MENSAGEM PERSONALIZADA
+# GERAR CHAMADA DE VENDAS
 # ==========================================
+
+def gerar_chamada_vendas(tipo_api, nome=""):
+
+    tipo_api = (tipo_api or "").lower().strip()
+
+    chamadas = {
+        "crypto": f"""
+            <h3 style="color:#8b5cf6;margin-top:0;">🚀 Automatizei isso e posso automatizar o seu negócio também</h3>
+            <p>Olá {nome}, este relatório de criptomoedas foi gerado automaticamente.</p>
+            <p>Se você precisa de automações parecidas no seu negócio, com integração de APIs, relatórios, bot ou envio automático de dados, eu posso montar isso sob medida.</p>
+            <p><b>Quer transformar processo manual em sistema real?</b> Me chama e vamos tirar isso do papel.</p>
+        """,
+        "ibge": f"""
+            <h3 style="color:#8b5cf6;margin-top:0;">📊 Dados, automação e resultado real</h3>
+            <p>Olá {nome}, esta automação processou dados públicos e entregou tudo organizado automaticamente.</p>
+            <p>Se você precisa de relatórios, dashboards, integrações com API, coleta automática ou qualquer solução em Python/Web, eu posso desenvolver para sua empresa.</p>
+            <p><b>Se quiser algo profissional e sob medida, me chama.</b></p>
+        """,
+        "imagem": f"""
+            <h3 style="color:#8b5cf6;margin-top:0;">📸 Automação criativa também vende</h3>
+            <p>Olá {nome}, este fluxo processou imagens e organizou tudo automaticamente.</p>
+            <p>Se você quer automações visuais, geração de conteúdo, integração com APIs, envio automático ou sistemas inteligentes para seu negócio, eu posso criar isso.</p>
+            <p><b>Se isso fez sentido pra você, eu posso montar um projeto parecido pro seu caso.</b></p>
+        """,
+        "default": f"""
+            <h3 style="color:#8b5cf6;margin-top:0;">🚀 Automação sob medida para o seu negócio</h3>
+            <p>Olá {nome}, este resultado foi gerado automaticamente pelo sistema.</p>
+            <p>Se você precisa de automação, integração com API, envio de email, bot, painel web ou SaaS simples, eu posso desenvolver uma solução sob medida.</p>
+            <p><b>Se quiser profissionalizar seu processo, me chama.</b></p>
+        """
+    }
+
+    return chamadas.get(tipo_api, chamadas["default"])
 
 def gerar_mensagem(nome):
     return f"""
@@ -66,7 +99,7 @@ Automação • Integração • Soluções Inteligentes
 # GERAR RELATÓRIO HTML
 # ==========================================
 
-def gerar_relatorio_html(dados):
+def gerar_relatorio_html(dados, chamada_comercial=None):
 
     if not dados:
 
@@ -100,8 +133,17 @@ def gerar_relatorio_html(dados):
         <p style="margin-top:20px;color:#94a3b8;font-size:14px;">
             Relatório gerado automaticamente pelo sistema de automações.
         </p>
-    </div>
     """
+
+    if chamada_comercial:
+
+        html += f"""
+        <div style="margin-top:24px;padding:18px;background:#1e293b;border-radius:12px;border:1px solid #334155;">
+            {chamada_comercial}
+        </div>
+        """
+
+    html += "</div>"
 
     return html
 
@@ -132,7 +174,7 @@ def _montar_attachments(caminho_arquivo):
 # ENVIAR EMAIL
 # ==========================================
 
-def enviar_email(destinatario, mensagem=None, anexo=None, dados=None):
+def enviar_email(destinatario, mensagem=None, anexo=None, dados=None, tipo_api=None, nome_usuario=None):
 
     if not os.getenv("RESEND_API_KEY"):
 
@@ -140,12 +182,23 @@ def enviar_email(destinatario, mensagem=None, anexo=None, dados=None):
 
     try:
 
+        chamada_comercial = gerar_chamada_vendas(
+            tipo_api,
+            nome_usuario or ""
+        )
+
         params = {
             "from": "Fabiano <contato@fabiano.tec.br>",
             "to": [destinatario],
             "subject": "🚀 Automação Executada",
             "text": mensagem or "",
-            "html": gerar_relatorio_html(dados) if dados else f"<p>{html_lib.escape(mensagem or '')}</p>",
+            "html": gerar_relatorio_html(dados, chamada_comercial) if dados else f"""
+                <div style="font-family:Arial,sans-serif;">
+                    <p>{html_lib.escape(mensagem or '')}</p>
+                    <hr>
+                    {chamada_comercial}
+                </div>
+            """,
         }
 
         attachments = _montar_attachments(anexo)
