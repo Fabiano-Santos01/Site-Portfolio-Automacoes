@@ -44,25 +44,67 @@ def gerar_chamada_vendas(tipo_api, nome=""):
             <h3 style="color:#8b5cf6;margin-top:0;">🚀 Automatizei isso e posso automatizar o seu negócio também</h3>
             <p>Olá {nome}, este relatório de criptomoedas foi gerado automaticamente.</p>
             <p>Se você precisa de automações parecidas no seu negócio, com integração de APIs, relatórios, bot ou envio automático de dados, eu posso montar isso sob medida.</p>
-            <p><b>Quer transformar processo manual em sistema real?</b> Me chama e vamos tirar isso do papel.</p>
+            <p><b>Quer transformar processo manual em sistema real?</b> Me chama e vamos tirar isso do papel respondendo a esse e-mail ou através do meu WhatsApp:
+            <br>
+            <a href="https://wa.me/5511972307705"
+            style="color:#22c55e;">
+            📱 Falar no WhatsApp
+            </a>
+           <br>
+            🌐 <a href="https://www.fabiano.tec.br"
+            style="color:#60a5fa;">
+            www.fabiano.tec.br
+            </a></p>
         """,
         "ibge": f"""
             <h3 style="color:#8b5cf6;margin-top:0;">📊 Dados, automação e resultado real</h3>
             <p>Olá {nome}, esta automação processou dados públicos e entregou tudo organizado automaticamente.</p>
             <p>Se você precisa de relatórios, dashboards, integrações com API, coleta automática ou qualquer solução em Python/Web, eu posso desenvolver para sua empresa.</p>
-            <p><b>Se quiser algo profissional e sob medida, me chama.</b></p>
+            <p><b>Se quiser algo profissional e sob medida, Pode me chamar respondendo esse e-mail ou através do meu WhatsApp:</b></p>
+            <br>
+            <a href="https://wa.me/5511972307705"
+            style="color:#22c55e;">
+            📱 Falar no WhatsApp
+            </a>
+           <br>
+            🌐 <a href="https://www.fabiano.tec.br"
+            style="color:#60a5fa;">
+            www.fabiano.tec.br
+            </a>
         """,
         "imagem": f"""
             <h3 style="color:#8b5cf6;margin-top:0;">📸 Automação criativa também vende</h3>
             <p>Olá {nome}, este fluxo processou imagens e organizou tudo automaticamente.</p>
             <p>Se você quer automações visuais, geração de conteúdo, integração com APIs, envio automático ou sistemas inteligentes para seu negócio, eu posso criar isso.</p>
-            <p><b>Se isso fez sentido pra você, eu posso montar um projeto parecido pro seu caso.</b></p>
+            <p>
+            <b>Se isso fez sentido pra você, eu posso montar um projeto parecido para o seu caso.</b><br><br>
+            Pode me chamar respondendo esse e-mail ou através do meu WhatsApp:
+            <br>
+            <a href="https://wa.me/5511972307705"
+            style="color:#22c55e;">
+            📱 Falar no WhatsApp
+            </a></p>
+           <br>
+            🌐 <a href="https://www.fabiano.tec.br"
+            style="color:#60a5fa;">
+            www.fabiano.tec.br
+            </a>
         """,
         "default": f"""
             <h3 style="color:#8b5cf6;margin-top:0;">🚀 Automação sob medida para o seu negócio</h3>
             <p>Olá {nome}, este resultado foi gerado automaticamente pelo sistema.</p>
             <p>Se você precisa de automação, integração com API, envio de email, bot, painel web ou SaaS simples, eu posso desenvolver uma solução sob medida.</p>
-            <p><b>Se quiser profissionalizar seu processo, me chama.</b></p>
+            <p><b>Se quiser profissionalizar seu processo, Pode me chamar respondendo esse e-mail ou através do meu WhatsApp:
+            <br>
+            <a href="https://wa.me/5511972307705"
+            style="color:#22c55e;">
+            📱 Falar no WhatsApp
+            </a>
+           <br>
+            🌐 <a href="https://www.fabiano.tec.br"
+            style="color:#60a5fa;">
+            www.fabiano.tec.br
+            </a></b></p>
         """
     }
 
