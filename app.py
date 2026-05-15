@@ -1,4 +1,5 @@
 import os
+import requests
 
 from datetime import datetime
 
@@ -51,6 +52,103 @@ app = Flask(
 CORS(app)
 
 # ==========================================
+# HELPERS
+# ==========================================
+
+def coletar_contexto_requisicao():
+    ip = request.headers.get("X-Forwarded-For", request.remote_addr or "desconhecido")
+    if "," in ip:
+        ip = ip.split(",")[0].strip()
+
+    ua = request.headers.get("User-Agent", "desconhecido")
+
+    sistema = "Desconhecido"
+    if "Windows" in ua:
+        sistema = "Windows"
+    elif "Android" in ua:
+        sistema = "Android"
+    elif "iPhone" in ua or "iPad" in ua:
+        sistema = "iPhone/iPad"
+    elif "Mac OS X" in ua or "Macintosh" in ua:
+        sistema = "macOS"
+    elif "Linux" in ua:
+        sistema = "Linux"
+
+    navegador = "Desconhecido"
+    if "Chrome" in ua and "Edg" not in ua and "OPR" not in ua:
+        navegador = "Chrome"
+    elif "Edg" in ua:
+        navegador = "Edge"
+    elif "Firefox" in ua:
+        navegador = "Firefox"
+    elif "Safari" in ua and "Chrome" not in ua:
+        navegador = "Safari"
+
+    dispositivo = "Mobile" if any(x in ua for x in ["Mobile", "Android", "iPhone", "iPad"]) else "Desktop"
+
+    cidade = "Desconhecida"
+    estado = "-"
+    pais = "-"
+    operadora = "-"
+
+    try:
+        resp = requests.get(
+            f"http://ip-api.com/json/{ip}?fields=status,country,regionName,city,isp",
+            timeout=4
+        )
+        geo = resp.json()
+        if geo.get("status") == "success":
+            cidade = geo.get("city", "-")
+            estado = geo.get("regionName", "-")
+            pais = geo.get("country", "-")
+            operadora = geo.get("isp", "-")
+    except Exception:
+        pass
+
+    return {
+        "ip": ip,
+        "cidade": cidade,
+        "estado": estado,
+        "pais": pais,
+        "operadora": operadora,
+        "sistema": sistema,
+        "navegador": navegador,
+        "dispositivo": dispositivo,
+        "user_agent": ua
+    }
+
+
+def enviar_aviso_telegram(acao, nome="Não informado", email="Não informado", whatsapp="Não informado", detalhes=""):
+    info = coletar_contexto_requisicao()
+    agora = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+
+    mensagem = f"""
+🚨 NOVO USO NO SITE
+
+Ação: {acao}
+Data/Hora: {agora}
+
+Nome: {nome}
+Email: {email}
+WhatsApp: {whatsapp}
+
+IP: {info["ip"]}
+Local: {info["cidade"]} - {info["estado"]} / {info["pais"]}
+Operadora: {info["operadora"]}
+
+Sistema: {info["sistema"]}
+Navegador: {info["navegador"]}
+Dispositivo: {info["dispositivo"]}
+
+{detalhes}
+""".strip()
+
+    try:
+        enviar_para_rede("telegram", mensagem)
+    except Exception as e:
+        print(f"[ERRO TELEGRAM LOG] {e}")
+
+# ==========================================
 # ROTAS PRINCIPAIS
 # ==========================================
 
@@ -94,6 +192,8 @@ def executar():
             'nome',
             'Dev'
         )
+
+        whatsapp = request.form.get("whatsapp", "").strip() or "Não informado"
 
         api_url = request.form.get(
             'api_url'
@@ -210,6 +310,14 @@ def executar():
             f"[EMAIL RESULTADO] {resultado_email}"
         )
 
+        enviar_aviso_telegram(
+            acao="Automação executada",
+            nome=nome,
+            email=email,
+            whatsapp=whatsapp,
+            detalhes=f"Tipo de API: {api_url or 'Não informada'}"
+        )
+
         # ==================================
         # VALIDAR RESULTADO
         # ==================================
@@ -280,6 +388,8 @@ def executar_bot():
             ""
         ).strip() or "Não informado"
 
+        whatsapp = request.form.get("bot_whatsapp", "").strip() or "Não informado"
+
         # ==================================
         # CAPTURAR INFORMAÇÕES DO REQUEST
         # ==================================
@@ -328,6 +438,7 @@ def executar_bot():
             f"🧾 Nova solicitação do site\n"
             f"Nome: {nome}\n"
             f"E-mail: {email}\n"
+            f"WhatsApp: {whatsapp}\n"
             f"IP: {ip}\n"
             f"User-Agent: {user_agent}\n"
             f"Data: {agora}\n\n"
