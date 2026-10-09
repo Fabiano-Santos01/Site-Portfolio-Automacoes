@@ -1,415 +1,462 @@
-<!-- Declaração do tipo de documento HTML5 -->
-<!DOCTYPE html>
-<!-- A classe 'light' define o tema claro como padrão ao carregar a página -->
-<html lang="pt-BR" class="light">
+<!doctype html>
+<html lang="pt-BR" class="theme-dark">
 <head>
-    <!-- Configurações básicas de codificação e responsividade (mobile-first) -->
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fabiano Santos - Portfólio Profissional</title>
-    
-    <!-- Importação do Tailwind CSS via CDN para estilização rápida usando classes no HTML -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Importação da fonte tipográfica 'Inter' direto do Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Importação da biblioteca FontAwesome para os ícones (ex: fa-bars, fa-whatsapp, etc.) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    
-    <!-- Seu arquivo CSS externo com estilos personalizados e variáveis de tema -->
-    <link rel="stylesheet" href="/style.css">
-
-    <style>
-        html { scroll-behavior: smooth; }
-        .hover-trigger:hover { transform: translateY(-5px); }
-        
-        /* WHATSAPP: Animação de entrada do menu */
-        .whatsapp-menu {
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(20px);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        /* Mostra o menu quando passa o mouse */
-        .whatsapp-container:hover .whatsapp-menu {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-    </style>
+  <!-- ========================= META / SEO ========================= -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0A0A0A">
+  <meta name="description" content="Fabiano da Costa Santos — estudante de Ciência da Computação com foco em backend, automação, dados, desenvolvimento e fundamentos de segurança.">
+  <meta property="og:title" content="Fabiano Santos — Developer Full Stack & Cyber">
+  <meta property="og:description" content="Portfólio técnico com jornada, projetos, stack, segurança, laboratório e trabalhos. ">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://fabiano.tec.br/">
+  <title>Fabiano Santos — Developer Full Stack & Cyber</title>
+  <!-- ========================= FONTES ========================= -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
 </head>
-<!-- CORPO DA PÁGINA -->
-<!-- As classes Tailwind configuram: cor de fundo, cor do texto, fonte base e impedem vazamento de rolagem horizontal (overflow-x-hidden) -->
-<body class="bg-background text-text-primary transition-colors duration-300 font-inter overflow-x-hidden">
+<body>
+  <!-- ========================= HUD / DECORAÇÃO GLOBAL ========================= -->
+  <div class="cyber-cursor-fixed" id="cursor-target" aria-hidden="true" title="Cyber security cursor"><span class="cursor-target-icon"><svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="17"/><circle cx="32" cy="32" r="5"/><path d="M32 3v12M32 49v12M3 32h12M49 32h12"/></svg></span></div>
+  <div class="scanline" aria-hidden="true"></div>
+  <div class="scroll-progress" aria-hidden="true"><span></span></div>
 
-    <!-- Elemento Canvas vazio. O JavaScript (script.js) usa ele para desenhar as partículas flutuantes do fundo -->
-    <canvas id="particle-canvas"></canvas>
-
-    <!-- CABEÇALHO (HEADER): Fica fixo no topo da tela (fixed top-0 w-full) e sobrepõe outros elementos graças ao z-index (z-50) -->
-    <header class="fixed w-full top-0 z-50 transition-all duration-300 backdrop-blur-md bg-card/80 shadow-sm">
-        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <!-- LOGO DO SITE: Ao clicar, redireciona para o topo da página (#) -->
-            <a href="#" class="text-2xl font-black text-text-heading tracking-tight hover:opacity-80 transition flex items-center gap-2 hover-sound">
-                <span class="text-blue-600">&lt;</span>Fabiano<span class="text-blue-600">/&gt;</span>
-            </a>
-            
-            <div class="flex items-center gap-6">
-                <!-- MENU DESKTOP: Oculto no celular (hidden), visível apenas em telas médias ou maiores (md:flex) -->
-                <ul class="hidden md:flex space-x-8 font-medium text-sm uppercase tracking-wide">
-                    <li><a href="#" class="hover:text-blue-600 transition hover-sound">Início</a></li>
-                    <li><a href="#jornada" class="hover:text-blue-600 transition hover-sound">Minha Jornada</a></li>
-                    <li><a href="projetos.html" class="hover:text-blue-600 transition hover-sound">Projetos</a></li>
-                    <li><a href="automacoes.html" class="hover:text-blue-600 transition">Automações</a></li>
-                    <li><a href="#competencias" class="hover:text-blue-600 transition hover-sound">Competências</a></li>
-                </ul>
-
-                <!-- BOTÃO DE TEMA (Claro/Escuro): Os ícones SVG de lua e sol são alternados lá no script.js -->
-                <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition focus:outline-none hover-sound">
-                    <svg id="theme-icon-moon" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
-                    <svg id="theme-icon-sun" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                </button>
-
-                <!-- BOTÃO DO MENU MOBILE (Hambúrguer): Só aparece em dispositivos móveis -->
-                <button id="menu-btn" class="md:hidden focus:outline-none hover-sound">
-                    <i class="fa fa-bars text-xl"></i>
-                </button>
-            </div>
-        </nav>
-        
-        <!-- CONTEÚDO DO MENU MOBILE: Inicialmente oculto (hidden), aparece ao clicar no botão hambúrguer acima -->
-        <div id="menu-container" class="hidden md:hidden bg-card border-t border-gray-100 dark:border-gray-700 absolute w-full left-0 p-4 shadow-lg">
-            <ul class="flex flex-col space-y-4 text-center">
-                <li><a href="#" class="nav-link block py-2 hover-sound">Início</a></li>
-                <li><a href="#jornada" class="nav-link block py-2 hover-sound">Minha Jornada</a></li>
-                <li><a href="projetos.html" class="nav-link block py-2 hover-sound">Projetos</a></li>
-                <li><a href="automacoes.html" class="nav-link block py-2 hover-sound">Automações</a></li>
-                <li><a href="#competencias" class="nav-link block py-2 hover-sound">Competências</a></li>
-            </ul>
-        </div>
-    </header>
-
-    <!-- CONTEÚDO PRINCIPAL: Abraça todas as seções grandes do portfólio -->
-    <main class="relative z-10">
-
-        <!-- SEÇÃO "SOBRE" (HERO): A primeira tela que o usuário vê. -->
-        <!-- O 'min-h-screen' garante que esse bloco ocupe 100% da altura da tela. -->
-        <section id="sobre" class="min-h-screen flex items-center justify-center pt-24 px-6 relative overflow-hidden">
-            <!-- Divs redondas e borradas (blur) que dão o efeito de luz/mancha colorida ao fundo (Blobs) -->
-            <div class="absolute -top-20 -left-20 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob pointer-events-none"></div>
-            <div class="absolute top-1/2 -right-20 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000 pointer-events-none"></div>
-            <div class="absolute -bottom-20 left-1/3 w-96 h-96 bg-green-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000 pointer-events-none"></div>
-
-            <div class="container mx-auto flex flex-col-reverse md:flex-row items-center gap-10 md:gap-16 z-10">
-                <!-- Bloco Esquerdo: Textos de apresentação -->
-                <div class="md:w-1/2 text-center md:text-left scroll-animate">
-                    <div class="inline-block px-3 py-1 mb-6 text-base font-bold tracking-widest text-blue-600 uppercase bg-blue-100 dark:bg-blue-100 dark:text-blue-400 rounded-full">
-                        Desenvolvedor Mobile & Automação
-                    </div>
-                    
-                    <!-- O nome 'Fabiano' possui o ID 'typed-name' onde o script.js cria o efeito de máquina de escrever -->
-                    <h1 class="text-4xl sm:text-5xl md:text-7xl font-black text-text-heading leading-tight mb-6">
-                        Olá, sou o <br>
-                        <span id="typed-name" class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">Fabiano</span>
-                    </h1>
-                    
-                    <!-- Resumo curto. Edite este texto livremente no futuro -->
-                    <p class="text-base md:text-xl text-text-secondary leading-relaxed mb-8 max-w-lg mx-auto md:mx-0">
-                        Estudante de <strong>Ciência da Computação</strong> transformando ideias em código. 
-                        Especialista em automação com Python, aplicativos Android e soluções criativas.
-                    </p>
-
-                    <!-- Botão de "Call to Action" apontando para a página de projetos -->
-                    <div class="flex justify-center md:justify-start mt-8">
-                        <a href="projetos.html" class="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center shadow-lg hover:shadow-blue-500/50 hover:-translate-y-2 transition duration-300 group hover-sound relative" title="Ver Todos os Projetos">
-                            <i class="fa fa-arrow-right text-3xl text-white group-hover:scale-110 transition"></i>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Bloco Direito: Foto do perfil -->
-                <div class="md:w-1/2 flex justify-center md:justify-end scroll-animate delay-200 mt-8 md:mt-0">
-                    <div class="relative w-72 h-72 md:w-[30rem] md:h-[30rem]">
-                        <!-- Se for trocar a foto, basta alterar o arquivo 'imagem/foto.jpg' ou mudar este caminho (src) -->
-                        <img src="imagem/foto.jpg" alt="Fabiano Santos" class="relative w-full h-full object-cover rounded-3xl shadow-2xl border-4 border-gray-200 dark:border-gray-700 transition duration-500 hover:scale-105">
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- SEÇÃO "JORNADA" (Linha do tempo) -->
-        <section id="jornada" class="py-24 px-6 bg-card/50">
-            <div class="container mx-auto">
-                <div class="text-center mb-16 scroll-animate">
-                    <h2 class="text-3xl md:text-4xl font-bold text-text-heading mb-4">Minha Jornada</h2>
-                    <p class="text-text-secondary text-lg">Evolução constante: do suporte administrativo ao desenvolvimento.</p>
-                </div>
-
-                <!-- Wrapper da Linha do Tempo. 'border-l-2' é o que cria o risco/traço vertical no Desktop -->
-                <div class="max-w-5xl mx-auto border-l-2 border-gray-200 dark:border-gray-700 pl-8 ml-4 md:ml-auto md:pl-0 md:border-l-0 md:relative">
-                    
-                    <!-- ITEM DE JORNADA 1: Para adicionar uma nova experiência, copie e cole este bloco mudando apenas o texto -->
-                    <div class="flex flex-col md:flex-row gap-6 mb-16 scroll-animate relative group hover-sound cursor-default">
-                        <!-- O pontinho colorido na linha do tempo -->
-                        <div class="hidden md:block absolute left-1/2 -translate-x-1/2 w-5 h-5 bg-blue-600 rounded-full border-4 border-background group-hover:scale-125 transition"></div>
-                        <div class="md:w-1/2 md:pr-16 md:text-right">
-                            <span class="text-base font-bold text-blue-600 mb-2 block">2026 - Atualmente</span>
-                            <h3 class="text-2xl font-bold text-text-heading">Desenvolvimento Mobile & Automação</h3>
-                        </div>
-                        <div class="md:w-1/2 md:pl-16">
-                            <p class="text-text-secondary text-lg leading-relaxed">
-                                Foco total no desenvolvimento de Apps Android Nativos (Kotlin) e Robôs de Automação (RPA) com Python para otimizar processos em empresas.
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- ITEM DE JORNADA 2 -->
-                    <div class="flex flex-col md:flex-row gap-6 mb-16 scroll-animate relative group hover-sound cursor-default">
-                        <div class="hidden md:block absolute left-1/2 -translate-x-1/2 w-5 h-5 bg-purple-600 rounded-full border-4 border-background group-hover:scale-125 transition"></div>
-                        <div class="md:w-1/2 md:pr-16 md:text-right md:order-1">
-                             <p class="text-text-secondary text-lg leading-relaxed">
-                                Ingresso no curso de Ciência da Computação. Aprofundamento em lógica, estruturas de dados e criação de soluções acadêmicas complexas.
-                            </p>
-                        </div>
-                        <div class="md:w-1/2 md:pl-16">
-                             <span class="text-base font-bold text-purple-600 mb-2 block">2025</span>
-                            <h3 class="text-2xl font-bold text-text-heading">Ciência da Computação (UNIP)</h3>
-                        </div>
-                    </div>
-
-                    <!-- ITEM DE JORNADA 3 -->
-                    <div class="flex flex-col md:flex-row gap-6 mb-16 scroll-animate relative group hover-sound cursor-default">
-                        <div class="hidden md:block absolute left-1/2 -translate-x-1/2 w-5 h-5 bg-green-500 rounded-full border-4 border-background group-hover:scale-125 transition"></div>
-                        <div class="md:w-1/2 md:pr-16 md:text-right">
-                            <span class="text-base font-bold text-green-500 mb-2 block">2024</span>
-                            <h3 class="text-2xl font-bold text-text-heading">Fundamentos da Programação</h3>
-                        </div>
-                        <div class="md:w-1/2 md:pl-16">
-                            <p class="text-text-secondary text-lg leading-relaxed">
-                                Início dos estudos em programação. Primeiros projetos em Python e Web (HTML/CSS), descobrindo a paixão pela tecnologia.
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- ITEM DE JORNADA 4 -->
-                     <div class="flex flex-col md:flex-row gap-6 scroll-animate relative group hover-sound cursor-default">
-                        <div class="hidden md:block absolute left-1/2 -translate-x-1/2 w-5 h-5 bg-gray-400 rounded-full border-4 border-background group-hover:scale-125 transition"></div>
-                        <div class="md:w-1/2 md:pr-16 md:text-right md:order-1">
-                             <p class="text-text-secondary text-lg leading-relaxed">
-                                Experiência sólida com rotinas administrativas, suporte ao usuário e domínio avançado do Pacote Office.
-                            </p>
-                        </div>
-                        <div class="md:w-1/2 md:pl-16">
-                             <span class="text-base font-bold text-gray-500 mb-2 block">2020 - 2023</span>
-                            <h3 class="text-2xl font-bold text-text-heading">Experiência Administrativa</h3>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- SEÇÃO "STACK TECNOLÓGICO" (Barra horizontal com ícones gigantes de habilidades) -->
-        <section class="py-20 px-6 border-b border-gray-100 dark:border-gray-800 bg-background">
-            <div class="container mx-auto text-center">
-                <h2 class="text-3xl font-bold text-text-heading mb-12 scroll-animate">Stack Tecnológico</h2>
-                
-                <!-- Contêiner Flex para distribuir os ícones responsivamente -->
-                <div class="flex flex-wrap justify-center gap-10 md:gap-16 opacity-90">
-                    <!-- Exemplo de Ícone (Android). Para mudar, troque a classe "fa-android" e o nome em <p> -->
-                    <div class="text-center group scroll-animate hover-sound cursor-pointer hover:-translate-y-2 transition duration-300">
-                        <i class="fa fa-android text-4xl md:text-6xl text-green-500 mb-3 group-hover:scale-110 transition"></i>
-                        <p class="text-sm font-bold text-text-secondary group-hover:text-green-500">Android</p>
-                    </div>
-                    <div class="text-center group scroll-animate delay-75 hover-sound cursor-pointer hover:-translate-y-2 transition duration-300">
-                        <i class="fa fa-code text-4xl md:text-6xl text-blue-500 mb-3 group-hover:scale-110 transition"></i>
-                        <p class="text-sm font-bold text-text-secondary group-hover:text-blue-500">Python</p>
-                    </div>
-                    <div class="text-center group scroll-animate delay-150 hover-sound cursor-pointer hover:-translate-y-2 transition duration-300">
-                        <i class="fa fa-file-excel-o text-4xl md:text-6xl text-green-700 mb-3 group-hover:scale-110 transition"></i>
-                        <p class="text-sm font-bold text-text-secondary group-hover:text-green-700">Excel</p>
-                    </div>
-                    <div class="text-center group scroll-animate delay-200 hover-sound cursor-pointer hover:-translate-y-2 transition duration-300">
-                        <i class="fa fa-file-powerpoint-o text-4xl md:text-6xl text-orange-600 mb-3 group-hover:scale-110 transition"></i>
-                        <p class="text-sm font-bold text-text-secondary group-hover:text-orange-600">PowerPoint</p>
-                    </div>
-                    <div class="text-center group scroll-animate delay-300 hover-sound cursor-pointer hover:-translate-y-2 transition duration-300">
-                        <i class="fa fa-magic text-4xl md:text-6xl text-blue-400 mb-3 group-hover:scale-110 transition"></i>
-                        <p class="text-sm font-bold text-text-secondary group-hover:text-blue-400">Photoshop</p>
-                    </div>
-                    <div class="text-center group scroll-animate delay-300 hover-sound cursor-pointer hover:-translate-y-2 transition duration-300">
-                        <i class="fa fa-film text-4xl md:text-6xl text-purple-500 mb-3 group-hover:scale-110 transition"></i>
-                        <p class="text-sm font-bold text-text-secondary group-hover:text-purple-500">Vídeo</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- SEÇÃO "COMPETÊNCIAS DETALHADAS" (Cards/Caixinhas dividindo suas linguagens e ferramentas) -->
-        <section id="competencias" class="py-24 px-6 bg-card/30">
-            <div class="container mx-auto">
-                <div class="text-center mb-16 scroll-animate">
-                    <h2 class="text-3xl md:text-4xl font-bold text-text-heading mb-4">Competências Detalhadas</h2>
-                    <p class="text-text-secondary">Visão técnica das minhas habilidades.</p>
-                </div>
-
-                <!-- O grid faz com que se criem 4 colunas em telas grandes (lg:grid-cols-4), e 1 no celular (grid-cols-1) -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <!-- CARD 1 -->
-                    <div class="bg-card p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 scroll-animate hover:shadow-lg transition duration-300 hover-sound">
-                        <h3 class="text-xl font-bold text-blue-600 mb-6 border-b pb-2 border-gray-100 dark:border-gray-700">Linguagens</h3>
-                        <ul class="space-y-3 text-text-secondary text-sm font-medium">
-                            <li class="flex items-center gap-2"><div class="w-2 h-2 bg-blue-500 rounded-full"></div> Python (Avançado)</li>
-                            <li class="flex items-center gap-2"><div class="w-2 h-2 bg-blue-500 rounded-full"></div> Kotlin (Intermediário)</li>
-                            <li class="flex items-center gap-2"><div class="w-2 h-2 bg-blue-500 rounded-full"></div> SQL (SQLite)</li>
-                            <li class="flex items-center gap-2"><div class="w-2 h-2 bg-blue-500 rounded-full"></div> HTML5 & CSS3</li>
-                        </ul>
-                    </div>
-                    <!-- CARD 2 -->
-                    <div class="bg-card p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 scroll-animate delay-100 hover:shadow-lg transition duration-300 hover-sound">
-                        <h3 class="text-xl font-bold text-purple-600 mb-6 border-b pb-2 border-gray-100 dark:border-gray-700">Bibliotecas</h3>
-                        <ul class="space-y-3 text-text-secondary text-sm font-medium">
-                            <li class="flex items-center gap-2"><div class="w-2 h-2 bg-purple-500 rounded-full"></div> Pandas (Dados)</li>
-                            <li class="flex items-center gap-2"><div class="w-2 h-2 bg-purple-500 rounded-full"></div> Selenium (RPA)</li>
-                            <li class="flex items-center gap-2"><div class="w-2 h-2 bg-purple-500 rounded-full"></div> Tkinter (Desktop)</li>
-                            <li class="flex items-center gap-2"><div class="w-2 h-2 bg-purple-500 rounded-full"></div> TailwindCSS</li>
-                        </ul>
-                    </div>
-                    <!-- CARD 3 -->
-                    <div class="bg-card p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 scroll-animate delay-200 hover:shadow-lg transition duration-300 hover-sound">
-                        <h3 class="text-xl font-bold text-green-600 mb-6 border-b pb-2 border-gray-100 dark:border-gray-700">Ferramentas</h3>
-                        <ul class="space-y-3 text-text-secondary text-sm font-medium">
-                            <li class="flex items-center gap-2"><div class="w-2 h-2 bg-green-500 rounded-full"></div> Android Studio</li>
-                            <li class="flex items-center gap-2"><div class="w-2 h-2 bg-green-500 rounded-full"></div> VS Code</li>
-                            <li class="flex items-center gap-2"><div class="w-2 h-2 bg-green-500 rounded-full"></div> Git & GitHub</li>
-                            <li class="flex items-center gap-2"><div class="w-2 h-2 bg-green-500 rounded-full"></div> PyInstaller</li>
-                        </ul>
-                    </div>
-                    <!-- CARD 4 -->
-                    <div class="bg-card p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 scroll-animate delay-300 hover:shadow-lg transition duration-300 hover-sound">
-                        <h3 class="text-xl font-bold text-orange-500 mb-6 border-b pb-2 border-gray-100 dark:border-gray-700">Design & Mídia</h3>
-                        <ul class="space-y-3 text-text-secondary text-sm font-medium">
-                            <li class="flex items-center gap-2"><div class="w-2 h-2 bg-orange-500 rounded-full"></div> Adobe Photoshop</li>
-                            <li class="flex items-center gap-2"><div class="w-2 h-2 bg-orange-500 rounded-full"></div> Edição de Vídeo</li>
-                            <li class="flex items-center gap-2"><div class="w-2 h-2 bg-orange-500 rounded-full"></div> Canva Design</li>
-                            <li class="flex items-center gap-2"><div class="w-2 h-2 bg-orange-500 rounded-full"></div> Excel Avançado</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- SEÇÃO DE CONTATO E REDES SOCIAIS -->
-        <section id="contato" class="py-24 px-6">
-            <div class="container mx-auto text-center max-w-2xl scroll-animate">
-                <h2 class="text-4xl font-bold text-text-heading mb-6">Vamos Conversar?</h2>
-                <p class="text-text-secondary mb-12 text-lg">
-                    Estou disponível para novos projetos e oportunidades profissionais.
-                </p>
-                
-                <!-- Contêiner dos botões circulares -->
-                <div class="flex justify-center gap-8 md:gap-12">
-                    
-                    <!-- E-mail: O 'mailto:xyz@email' tenta abrir automaticamente o aplicativo de e-mail do usuário -->
-                    <a href="mailto:fcs.ti01@gmail.com" class="w-20 h-20 bg-card rounded-full flex items-center justify-center shadow-lg hover:shadow-2xl hover:-translate-y-2 transition duration-300 group border border-gray-200 dark:border-gray-700 hover-sound relative" title="Enviar E-mail">
-                        <i class="fa fa-envelope text-4xl text-text-secondary group-hover:text-blue-600 transition"></i>
-                    </a>
-
-                    <!-- LinkedIn -->
-                    <a href="https://www.linkedin.com/in/fabiano-santos-96a72a37a/" target="_blank" class="w-20 h-20 bg-card rounded-full flex items-center justify-center shadow-lg hover:shadow-2xl hover:-translate-y-2 transition duration-300 group border border-gray-200 dark:border-gray-700 hover-sound" title="LinkedIn">
-                        <i class="fa fa-linkedin text-4xl text-text-secondary group-hover:text-[#0077b5] transition"></i>
-                    </a>
-
-                    <!-- GitHub -->
-                    <a href="https://github.com/Fabiano-Santos01" target="_blank" class="w-20 h-20 bg-card rounded-full flex items-center justify-center shadow-lg hover:shadow-2xl hover:-translate-y-2 transition duration-300 group border border-gray-200 dark:border-gray-700 hover-sound" title="GitHub">
-                        <i class="fa fa-github text-4xl text-text-secondary group-hover:text-black dark:group-hover:text-white transition"></i>
-                    </a>
-
-                    <!-- Instagram -->
-                    <a href="https://www.instagram.com/fabiano4fun/" target="_blank" class="w-20 h-20 bg-card rounded-full flex items-center justify-center shadow-lg hover:shadow-2xl hover:-translate-y-2 transition duration-300 group border border-gray-200 dark:border-gray-700 hover-sound" title="Instagram">
-                        <i class="fa fa-instagram text-4xl text-text-secondary group-hover:text-[#E1306C] transition"></i>
-                    </a>
-
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- RODAPÉ DA PÁGINA (FOOTER) -->
-    <footer class="bg-slate-900 text-slate-400 py-10 text-center relative z-10 border-t border-slate-800">
-        <div class="container mx-auto">
-            <!-- Atualize aqui o ano sempre que necessário -->
-            <p>&copy; 2025 Fabiano da Costa Santos. Todos os direitos reservados.</p>
-        </div>
-    </footer>
-
-    <!-- BOTÃO FLUTUANTE DE WHATSAPP (com opções sub-menu) -->
-    <div class="whatsapp-container fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3 group">
-        
-        <!-- Lista de Botões do Whatsapp: Ficam invisíveis e só sobem se você passar o mouse no ícone pai. -->
-        <div class="whatsapp-menu flex flex-col gap-3">
-            <!-- Link Comercial: Edite o número logo depois de 'wa.me/' se precisar -->
-            <a href="https://wa.me/5511919477235" target="_blank" class="flex items-center gap-3 bg-white dark:bg-slate-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 px-4 py-2 rounded-full shadow-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition hover-sound">
-                <span class="font-bold text-sm">Comercial</span>
-                <div class="bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center">
-                    <i class="fa fa-briefcase"></i>
-                </div>
-            </a>
-            
-            <!-- Link Particular: Edite o número logo depois de 'wa.me/' se precisar -->
-            <a href="https://wa.me/5511972307705" target="_blank" class="flex items-center gap-3 bg-white dark:bg-slate-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 px-4 py-2 rounded-full shadow-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition hover-sound">
-                <span class="font-bold text-sm">Particular</span>
-                <div class="bg-green-500 text-white w-8 h-8 rounded-full flex items-center justify-center">
-                    <i class="fa fa-user"></i>
-                </div>
-            </a>
-        </div>
-
-        <!-- Botão Principal do Whatsapp (Verde e com animação de pulso) -->
-        <button class="bg-[#25D366] hover:bg-[#20b857] text-white w-16 h-16 rounded-full shadow-2xl flex items-center justify-center text-4xl hover:scale-110 transition duration-300 animate-bounce-slow border-4 border-card hover-sound">
-            <i class="fa fa-whatsapp"></i>
-        </button>
+  <!-- ========================= HEADER / NAVEGAÇÃO ========================= -->
+  <header class="site-header" id="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="#inicio" aria-label="Fabiano.dev">
+        <span class="brand-symbol">✦</span><span>FABIANO</span><b>.DEV</b>
+      </a>
+      <nav class="main-nav" id="main-nav" aria-label="Navegação principal">
+        <a href="#sobre" data-i18n="nav.about">SOBRE</a>
+        <a href="#jornada" data-i18n="nav.journey">JORNADA</a>
+        <a href="#projetos" data-i18n="nav.projects">PROJETOS</a>
+        <a href="#trabalhos" data-i18n="nav.work">TRABALHOS</a>
+        <a href="#stack" data-i18n="nav.stack">STACK</a>
+        <a href="#seguranca" data-i18n="nav.security">SEGURANÇA</a>
+        <a href="#laboratorio" data-i18n="nav.lab">LAB</a>
+        <a href="#contato" data-i18n="nav.contact">CONTATO</a>
+      </nav>
+      <div class="header-actions">
+        <button class="icon-button" id="lang-toggle" aria-label="Alternar idioma">PT</button>
+        <button class="icon-button" id="theme-toggle" aria-label="Alternar tema">◐</button>
+        <button class="sound-button" id="sound-toggle" aria-pressed="false" aria-label="Alternar som">♪</button>
+        <button class="mobile-toggle" id="mobile-toggle" aria-label="Abrir menu" aria-expanded="false">☰</button>
+      </div>
     </div>
+  </header>
 
-    <!-- Importa as lógicas e animações de JavaScript presentes na raiz da pasta -->
-    <script src="script.js"></script>
+  <main>
+    <!-- ========================= 00 / HERO ========================= -->
+    <section id="inicio" class="hero section-grid" data-tone="lime">
+      <div class="container hero-grid">
+        <div class="hero-copy reveal">
+          <div class="eyebrow"><span></span><span data-i18n="hero.eyebrow">OPEN TO WORK</span></div>
+          <p class="mono hero-kicker" data-i18n="hero.kicker">FULL STACK · AUTOMAÇÃO · DADOS · CYBER</p>
+          <h1 class="hero-title crash-title">
+            <span data-i18n="hero.t1">DEVELOPER</span>
+            <span data-i18n="hero.t2">FULL STACK</span>
+            <span class="crash-word" data-i18n="hero.t3">&amp; CYBER</span>
+          </h1>
+          <p class="hero-lede" data-i18n="hero.lede">Interfaces, APIs e automações construídas entre faculdade, curiosidade e problemas reais de operação.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#projetos" data-i18n="hero.projects">VER PROJETOS →</a>
+            <a class="btn btn-ghost" href="#contato" data-i18n="hero.contact">&gt;_ FALAR COMIGO</a>
+          </div>
+          <div class="hero-meta mono"><span>BUILD 05</span><span>PYTHON</span><span>JAVA</span><span>KOTLIN</span><span>SQL</span><span>REST</span></div>
+        </div>
+        <div class="hero-visual reveal reveal-delay-1">
+          <div class="hero-photo-frame">
+            <div class="photo-top mono"><span>● ● ●</span><span>fabiano@dev:~$</span></div>
+            <div class="photo-status mono"><span class="status-dot"></span><span data-i18n="hero.status">PROFILE / CURRENT BUILD</span></div>
+            <img class="hero-photo" src="/imagem/fabiano-cyber.webp" alt="Fabiano Santos" loading="eager">
+            <div class="photo-footer mono"><span>PYTHON · KOTLIN · SQL</span><span>SECURE CHANNEL</span></div>
+            <div class="glitch-overlay" aria-hidden="true"></div>
+          </div>
+          <div class="hero-side-rail mono"><span>01</span><span>BACKEND</span><span>CYBER</span></div>
+        </div>
+      </div>
+      <div class="hero-strip infinite-strip" aria-label="Tecnologias">
+        <div class="strip-track"><span>PYTHON</span><i>✦</i><span>APIs</span><i>✦</i><span>DADOS</span><i>✦</i><span>SQL</span><i>✦</i><span>WEB</span><i>✦</i><span>ANDROID</span><i>✦</i><span>AUTOMAÇÃO</span><i>✦</i><span>GITHUB</span><i>✦</i><span>SECURITY</span><i>✦</i><span>PYTHON</span><i>✦</i><span>APIs</span><i>✦</i><span>DADOS</span><i>✦</i><span>SQL</span><i>✦</i><span>WEB</span><i>✦</i><span>ANDROID</span><i>✦</i><span>AUTOMAÇÃO</span><i>✦</i></div>
+      </div>
+    </section>
 
-    <!-- Script Interno: Adiciona um efeito sonoro de 'Pop' quando o mouse passa sobre os botões -->
-    <script>
-        // Só carrega a função de áudio após toda a página carregar
-        document.addEventListener('DOMContentLoaded', () => {
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            
-            if (AudioContext) {
-                const audioCtx = new AudioContext();
-                
-                // Função que sintetiza som nativamente no navegador (não depende de um arquivo .mp3 ou .wav pesado)
-                function playSoftPop() {
-                    if (audioCtx.state === 'suspended') { audioCtx.resume(); }
-                    const oscillator = audioCtx.createOscillator();
-                    const gainNode = audioCtx.createGain();
+    <!-- ========================= 01 / SOBRE ========================= -->
+    <section id="sobre" class="section section-about" data-tone="amber">
+      <div class="container">
+        <div class="section-head reveal">
+          <div class="eyebrow"><span></span><span data-i18n="about.eyebrow">01 / SOBRE</span></div>
+          <h2 class="crash-title" data-i18n-html="about.title">Construir é melhor<br>do que apenas <em class="crash-accent">estudar.</em></h2>
+        </div>
+        <div class="about-grid">
+          <article class="about-copy reveal">
+            <p class="lead-paragraph" data-i18n="about.p1">Sou estudante de Ciência da Computação na UNIP, com foco em backend, automação, dados e integração de sistemas. Minha experiência em e-commerce me ensinou a olhar para software como ferramenta de operação: algo que precisa funcionar, ser compreensível e resolver um problema.</p>
+            <p data-i18n="about.p2">Hoje transformo estudo em projetos próprios: APIs, automações, aplicações Android, sistemas web, análise de dados e fundamentos de segurança. Gosto de entender o problema, criar uma solução mínima e depois melhorar.</p>
+            <div class="quote-line mono" data-i18n="about.quote">“Código útil é aquele que deixa o próximo passo mais simples.”</div>
+          </article>
+          <div class="stats-grid reveal reveal-delay-1">
+            <div class="stat-card"><strong>05+</strong><span data-i18n="about.s1">ANOS EM OPERAÇÕES DIGITAIS</span></div>
+            <div class="stat-card"><strong>04º</strong><span data-i18n="about.s2">SEMESTRE DE CIÊNCIA DA COMPUTAÇÃO</span></div>
+            <div class="stat-card"><strong>10+</strong><span data-i18n="about.s3">PROJETOS E LABORATÓRIOS</span></div>
+            <div class="stat-card accent"><strong>∞</strong><span data-i18n="about.s4">CURIOSIDADE TÉCNICA</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-                    // Configura a frequência do som e como ela diminui rápido (fade-out)
-                    oscillator.type = 'sine';
-                    oscillator.frequency.setValueAtTime(800, audioCtx.currentTime);
-                    oscillator.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.1);
+    <!-- ========================= 02 / JORNADA CRONOLÓGICA ========================= -->
+    <section id="jornada" class="section section-jornada" data-tone="cyan">
+      <div class="container">
+        <div class="section-head reveal">
+          <div class="eyebrow"><span></span><span data-i18n="journey.eyebrow">02 / JORNADA</span></div>
+          <h2 class="crash-title" data-i18n-html="journey.title">Uma jornada em<br><em class="crash-accent">camadas.</em></h2>
+          <p data-i18n="journey.subtitle">Cada etapa adiciona uma camada diferente de repertório. Menos promessa, mais evidência.</p>
+        </div>
+        <div class="timeline" id="timeline">
+          <article class="timeline-item reveal"><div class="timeline-year">2020 → 2025</div><div class="timeline-node">01</div><div class="timeline-card"><div class="timeline-top"><h3 class="crash-target" data-i18n="journey.1.title">Operações digitais &amp; e-commerce</h3><button class="text-button detail-toggle" data-detail="j1" data-i18n="common.details">DETALHES +</button></div><p data-i18n="journey.1.text">Gestão de marketplaces, atendimento, anúncios, logística, dados e resolução de problemas em ambientes digitais.</p><span class="mono" data-i18n="journey.1.tags">Mercado Livre · Amazon · Shopee · Magalu · Shein</span><div class="timeline-detail" id="j1" data-i18n="journey.1.detail">Foi a fase que me ensinou que um processo só é bom quando consegue funcionar sob pressão, com clareza e continuidade.</div></div></article>
+          <article class="timeline-item reveal reveal-delay-1"><div class="timeline-year">25 FEV 2025</div><div class="timeline-node">02</div><div class="timeline-card"><div class="timeline-top"><h3 class="crash-target" data-i18n="journey.2.title">Início da Ciência da Computação</h3><button class="text-button detail-toggle" data-detail="j2" data-i18n="common.details">DETALHES +</button></div><p data-i18n="journey.2.text">Entrada no Bacharelado em Ciência da Computação na UNIP, trazendo base formal para a prática.</p><span class="mono" data-i18n="journey.2.tags">UNIP · LÓGICA · POO · ESTRUTURAS</span><div class="timeline-detail" id="j2" data-i18n="journey.2.detail">A faculdade consolidou lógica de programação, orientação a objetos, estruturas de dados, banco de dados e fundamentos de engenharia de software.</div></div></article>
+          <article class="timeline-item reveal"><div class="timeline-year">PROJETO 01</div><div class="timeline-node">03</div><div class="timeline-card"><div class="timeline-top"><h3 class="crash-target" data-i18n="journey.3.title">Snake em Kotlin</h3><button class="text-button detail-toggle" data-detail="j3" data-i18n="common.details">DETALHES +</button></div><p data-i18n="journey.3.text">Primeiro jogo em Kotlin, transformando lógica e estados em uma aplicação executável.</p><span class="mono">KOTLIN · GAME LOGIC · STATE</span><div class="timeline-detail" id="j3" data-i18n="journey.3.detail">O projeto marcou a passagem de exercícios isolados para um software com entrada de usuário, estados, regras e comportamento contínuo.</div></div></article>
+          <article class="timeline-item reveal reveal-delay-1"><div class="timeline-year">PROJETO 02</div><div class="timeline-node">04</div><div class="timeline-card"><div class="timeline-top"><h3 class="crash-target" data-i18n="journey.4.title">Calculadora dos Preguiçosos</h3><button class="text-button detail-toggle" data-detail="j4" data-i18n="common.details">DETALHES +</button></div><p data-i18n="journey.4.text">Aplicação Android para calcular NP1, AVA, PIN e Exame com regras acadêmicas.</p><span class="mono">KOTLIN · ANDROID · COMPOSE · MATERIAL 3</span><div class="timeline-detail" id="j4" data-i18n="journey.4.detail">Projeto funcional com validação de entradas, gerenciamento de estado, componentes reutilizáveis, reprodução de áudio e geração de APK.</div></div></article>
+          <article class="timeline-item reveal"><div class="timeline-year">PROJETO 03</div><div class="timeline-node">05</div><div class="timeline-card"><div class="timeline-top"><h3 class="crash-target" data-i18n="journey.5.title">Automação de Relatórios</h3><button class="text-button detail-toggle" data-detail="j5" data-i18n="common.details">DETALHES +</button></div><p data-i18n="journey.5.text">API → processamento → relatório → entrega. A primeira automação ponta a ponta.</p><span class="mono">PYTHON · PANDAS · REST API · SMTP</span><div class="timeline-detail" id="j5" data-i18n="journey.5.detail">Integração com API do Banco Central, tratamento com Pandas, exportação CSV/XLSX e envio automatizado por e-mail.</div></div></article>
+          <article class="timeline-item reveal reveal-delay-1"><div class="timeline-year">PROJETO 04</div><div class="timeline-node">06</div><div class="timeline-card"><div class="timeline-top"><h3 class="crash-target" data-i18n="journey.6.title">Plataforma Web de Automação</h3><button class="text-button detail-toggle" data-detail="j6" data-i18n="common.details">DETALHES +</button></div><p data-i18n="journey.6.text">Backend Flask, interface web, formulários, endpoints, downloads e serviços no mesmo produto.</p><span class="mono">FLASK · PYTHON · JAVASCRIPT · APIS</span><div class="timeline-detail" id="j6" data-i18n="journey.6.detail">O laboratório aproximou backend e interface, com serviços separados e fluxos reais de processamento.</div></div></article>
+          <article class="timeline-item reveal"><div class="timeline-year">PROJETO 05</div><div class="timeline-node">07</div><div class="timeline-card"><div class="timeline-top"><h3 class="crash-target" data-i18n="journey.7.title">Java REST &amp; POO</h3><button class="text-button detail-toggle" data-detail="j7" data-i18n="common.details">DETALHES +</button></div><p data-i18n="journey.7.text">Estudos práticos em Java para organizar classes, endpoints, regras e dados.</p><span class="mono">JAVA · POO · REST · SQL</span><div class="timeline-detail" id="j7" data-i18n="journey.7.detail">Inclui projetos de API REST e exercícios de encapsulamento, herança, polimorfismo, composição e organização de código.</div></div></article>
+          <article class="timeline-item reveal reveal-delay-1"><div class="timeline-year">PROJETO 06</div><div class="timeline-node">08</div><div class="timeline-card"><div class="timeline-top"><h3 class="crash-target" data-i18n="journey.8.title">Cybersecurity Lab</h3><button class="text-button detail-toggle" data-detail="j8" data-i18n="common.details">DETALHES +</button></div><p data-i18n="journey.8.text">Laboratórios próprios para estudar redes, segurança de aplicações e automação defensiva.</p><span class="mono">TCP/IP · DNS · PYTHON · TROUBLESHOOTING</span><div class="timeline-detail" id="j8" data-i18n="journey.8.detail">A trilha inclui estudos de port scanning, fundamentos de autenticação, tratamento de erros, logs, criptografia básica e práticas seguras. É estudo prático, não experiência profissional.</div></div></article>
+          <article class="timeline-item reveal"><div class="timeline-year">PROJETO 07</div><div class="timeline-node">09</div><div class="timeline-card"><div class="timeline-top"><h3 class="crash-target" data-i18n="journey.9.title">Tela_A7UL / Jogo de terminal</h3><button class="text-button detail-toggle" data-detail="j9" data-i18n="common.details">DETALHES +</button></div><p data-i18n="journey.9.text">RPG em Python com combate, exploração, inventário, save system, eventos e áudio.</p><span class="mono">PYTHON · POO · JSON · PERSISTÊNCIA</span><div class="timeline-detail" id="j9" data-i18n="journey.9.detail">Projeto modular com src/, áudio, múltiplos slots, NG+, bosses, cidades e estrutura de mundo. O arquivo-fonte foi incluído no projeto do portfólio.</div></div></article>
+          <article class="timeline-item reveal reveal-delay-1"><div class="timeline-year">PROJETO 08</div><div class="timeline-node">10</div><div class="timeline-card"><div class="timeline-top"><h3 class="crash-target" data-i18n="journey.10.title">IMPLACÁVEL Technology</h3><button class="text-button detail-toggle" data-detail="j10" data-i18n="common.details">DETALHES +</button></div><p data-i18n="journey.10.text">Trabalho colaborativo de front-end, UX/UI, interações, tema e IA contextual.</p><span class="mono">REACT · TYPESCRIPT · UX/UI · IA</span><div class="timeline-detail" id="j10" data-i18n="journey.10.detail">Reconstrução e refinamento de um site institucional com linguagem editorial/cyber e componentes interativos.</div></div></article>
+          <article class="timeline-item reveal"><div class="timeline-year">AGORA</div><div class="timeline-node">11</div><div class="timeline-card current"><div class="timeline-top"><h3 class="crash-target" data-i18n="journey.11.title">Preparando o próximo salto</h3><button class="text-button detail-toggle" data-detail="j11" data-i18n="common.details">DETALHES +</button></div><p data-i18n="journey.11.text">Buscando estágio/júnior para transformar laboratório e formação em experiência profissional verificável.</p><span class="mono">BACKEND · AUTOMATION · SECURITY · CLOUD</span><div class="timeline-detail" id="j11" data-i18n="journey.11.detail">Próximo passo: aprofundar backend, cloud e segurança em um ambiente profissional, aprender com uma equipe e entregar software útil.</div></div></article>
+        </div>
+      </div>
+    </section>
 
-                    gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime); 
-                    gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+    <!-- ========================= 03 / PROJETOS ========================= -->
+    <section id="projetos" class="section section-projects" data-tone="violet">
+      <div class="container">
+        <div class="section-head reveal">
+          <div class="eyebrow"><span></span><span data-i18n="projects.eyebrow">03 / PROJETOS</span></div>
+          <h2 class="crash-title" data-i18n-html="projects.title">Onde a ideia<br>vira <em class="crash-accent">software.</em></h2>
+          <p data-i18n="projects.subtitle">Projetos próprios usados para transformar estudo em prática, não apenas em aba de navegador.</p>
+        </div>
+        <div class="filter-row" id="project-filters">
+          <button class="filter active" data-filter="all" data-i18n="filters.all">TODOS</button>
+          <button class="filter" data-filter="backend" data-i18n="filters.backend">BACKEND</button>
+          <button class="filter" data-filter="mobile" data-i18n="filters.mobile">MOBILE</button>
+          <button class="filter" data-filter="automation" data-i18n="filters.automation">AUTOMAÇÃO</button>
+          <button class="filter" data-filter="security" data-i18n="filters.security">SECURITY</button>
+          <button class="filter" data-filter="game" data-i18n="filters.game">GAME</button>
+          <button class="filter" data-filter="web" data-i18n="filters.web">WEB</button>
+        </div>
+        <div class="project-grid" id="project-grid">
+          <button class="project-card reveal" data-project="selic" data-tags="automation backend">
+            <span class="project-index mono">01 / AUTOMATION</span><span class="project-tech mono">PYTHON</span>
+            <h3 data-project-title="selic">Automação de Relatórios</h3><p data-project-summary="selic">API do Banco Central, Pandas, CSV/XLSX e envio automático por e-mail.</p>
+            <span class="project-link" data-i18n="common.details">VER DETALHES ↗</span>
+          </button>
+          <button class="project-card reveal reveal-delay-1" data-project="flask" data-tags="web backend automation">
+            <span class="project-index mono">02 / WEB</span><span class="project-tech mono">FLASK</span>
+            <h3 data-project-title="flask">Plataforma Web de Automação</h3><p data-project-summary="flask">Interface web para executar automações, integrar serviços e organizar processamento.</p>
+            <span class="project-link" data-i18n="common.details">VER DETALHES ↗</span>
+          </button>
+          <button class="project-card reveal" data-project="calc" data-tags="mobile">
+            <span class="project-index mono">03 / MOBILE</span><span class="project-tech mono">ANDROID</span>
+            <h3 data-project-title="calc">Calculadora dos Preguiçosos</h3><p data-project-summary="calc">App Android em Kotlin para cálculo de médias e regras acadêmicas.</p>
+            <span class="project-link" data-i18n="common.details">VER DETALHES ↗</span>
+          </button>
+          <button class="project-card reveal reveal-delay-1" data-project="java" data-tags="backend">
+            <span class="project-index mono">04 / JAVA</span><span class="project-tech mono">JAVA</span>
+            <h3 data-project-title="java">API REST &amp; POO</h3><p data-project-summary="java">Estudos de backend em Java, objetos, endpoints, organização e dados.</p>
+            <span class="project-link" data-i18n="common.details">VER DETALHES ↗</span>
+          </button>
+          <button class="project-card reveal" data-project="oficina" data-tags="automation backend">
+            <span class="project-index mono">05 / DESKTOP</span><span class="project-tech mono">PYTHON</span>
+            <h3 data-project-title="oficina">Oficina Digital Manager</h3><p data-project-summary="oficina">Projeto desktop em Python/Tkinter com SQLite para organizar uma rotina operacional.</p>
+            <span class="project-link" data-i18n="common.details">VER DETALHES ↗</span>
+          </button>
+          <button class="project-card reveal reveal-delay-1" data-project="rpg" data-tags="game backend">
+            <span class="project-index mono">06 / RPG</span><span class="project-tech mono">PYTHON</span>
+            <h3 data-project-title="rpg">RPG Python</h3><p data-project-summary="rpg">Jogo de terminal com save system, eventos, inventário, cidades, bosses e progressão.</p>
+            <span class="project-link" data-i18n="common.details">VER DETALHES ↗</span>
+          </button>
+          <button class="project-card reveal" data-project="cyber" data-tags="security">
+            <span class="project-index mono">07 / SECURITY</span><span class="project-tech mono">PYTHON</span>
+            <h3 data-project-title="cyber">Cybersecurity Lab</h3><p data-project-summary="cyber">Laboratórios de estudo para redes, troubleshooting, segurança de aplicações e automação defensiva.</p>
+            <span class="project-link" data-i18n="common.details">VER DETALHES ↗</span>
+          </button>
+          <button class="project-card reveal reveal-delay-1" data-project="tela" data-tags="game backend">
+            <span class="project-index mono">08 / TERMINAL</span><span class="project-tech mono">PYTHON + PYGAME</span>
+            <h3 data-project-title="tela">Tela_A7UL</h3><p data-project-summary="tela">RPG modular com áudio, persistência, combate, mundo e sistema NG+.</p>
+            <span class="project-link" data-i18n="common.details">VER DETALHES ↗</span>
+          </button>
+        </div>
+      </div>
+    </section>
 
-                    oscillator.connect(gainNode);
-                    gainNode.connect(audioCtx.destination);
-                    oscillator.start();
-                    oscillator.stop(audioCtx.currentTime + 0.1);
-                }
+    <!-- ========================= 04 / TRABALHOS ========================= -->
+    <section id="trabalhos" class="section section-work" data-tone="red">
+      <div class="container">
+        <div class="section-head reveal">
+          <div class="eyebrow"><span></span><span data-i18n="work.eyebrow">04 / TRABALHOS</span></div>
+          <h2 class="crash-title" data-i18n-html="work.title">Projetos que saem<br>do <em class="crash-accent">laboratório.</em></h2>
+          <p data-i18n="work.subtitle">Uma área separada para trabalhos reais, colaborações e futuros projetos entregues.</p>
+        </div>
+        <div class="work-feature reveal">
+          <div class="work-mark">IM</div>
+          <div><span class="mono">COLLAB / WEB / UX</span><h3>IMPLACÁVEL Technology</h3><p data-i18n="work.implacavel">Projeto colaborativo desenvolvido com foco em interface, experiência, interações, identidade e IA contextual.</p><a class="btn btn-ghost" href="https://implacavel-company.github.io/Implacavel-WebSite/" target="_blank" rel="noreferrer" data-i18n="work.open">ABRIR PROJETO ↗</a></div>
+        </div>
+        <div class="future-work"><span class="mono">WORKFLOW / FUTURE</span><p data-i18n="work.future">Novos trabalhos entram aqui com título, objetivo, tecnologia, resultado e link. A estrutura já está pronta para duplicar o card sem quebrar o layout.</p></div>
+      </div>
+    </section>
 
-                // Seleciona todos os elementos clicáveis que possuam a classe 'hover-sound' ou sejam links (<a> e <button>)
-                const interactiveElements = document.querySelectorAll('.hover-sound, a, button');
-                interactiveElements.forEach(el => {
-                    el.addEventListener('mouseenter', () => { playSoftPop(); });
-                });
-            }
-        });
-    </script>
+    <!-- ========================= 05 / STACK ========================= -->
+    <section id="stack" class="section section-stack" data-tone="cyan">
+      <div class="container">
+        <div class="section-head reveal">
+          <div class="eyebrow"><span></span><span data-i18n="stack.eyebrow">05 / STACK</span></div>
+          <h2 class="crash-title" data-i18n-html="stack.title">As ferramentas<br>por trás do <em class="crash-accent">código.</em></h2>
+          <p data-i18n="stack.subtitle">Tecnologias usadas nos projetos e assuntos que fazem parte do meu caminho de estudo.</p>
+        </div>
+        <div class="stack-layout">
+          <div class="terminal-card reveal" id="stack-terminal">
+            <div class="terminal-top mono"><span>● ● ●</span><span>fabiano@stack:~$</span></div>
+            <pre id="stack-output">$ inspect python
+&gt; status: active
+&gt; context: backend / automation / data
+&gt; mode: practice / study
+&gt; next: apply in a real project</pre>
+            <span class="terminal-footer mono">INTERACTIVE CHANNEL</span>
+          </div>
+          <div class="stack-grid reveal reveal-delay-1" id="stack-grid">
+<button class="stack-chip" data-stack="Python" data-category="backend" type="button">
+      <span class="stack-icon-wrap"><img class="stack-logo" loading="lazy" src="/assets/tech-icons/python.svg" alt="Python icon"><span class="stack-fallback">P</span></span>
+      <span class="stack-copy"><b>Python</b><small>backend · automation</small></span>
+    </button>
+<button class="stack-chip" data-stack="Java" data-category="backend" type="button">
+      <span class="stack-icon-wrap"><img class="stack-logo" loading="lazy" src="/assets/tech-icons/java.svg" alt="Java icon"><span class="stack-fallback">J</span></span>
+      <span class="stack-copy"><b>Java</b><small>oop · backend</small></span>
+    </button>
+<button class="stack-chip" data-stack="Kotlin" data-category="mobile" type="button">
+      <span class="stack-icon-wrap"><img class="stack-logo" loading="lazy" src="/assets/tech-icons/kotlin.svg" alt="Kotlin icon"><span class="stack-fallback">K</span></span>
+      <span class="stack-copy"><b>Kotlin</b><small>android · jvm</small></span>
+    </button>
+<button class="stack-chip" data-stack="SQL" data-category="data" type="button">
+      <span class="stack-icon-wrap"><img class="stack-logo" loading="lazy" src="/assets/tech-icons/sql.svg" alt="SQL icon"><span class="stack-fallback">S</span></span>
+      <span class="stack-copy"><b>SQL</b><small>queries · data</small></span>
+    </button>
+<button class="stack-chip" data-stack="JavaScript" data-category="web" type="button">
+      <span class="stack-icon-wrap"><img class="stack-logo" loading="lazy" src="/assets/tech-icons/javascript.svg" alt="JavaScript icon"><span class="stack-fallback">J</span></span>
+      <span class="stack-copy"><b>JavaScript</b><small>web · interactions</small></span>
+    </button>
+<button class="stack-chip" data-stack="HTML / CSS" data-category="web" type="button">
+      <span class="stack-icon-wrap"><img class="stack-logo" loading="lazy" src="/assets/tech-icons/html-css.svg" alt="HTML / CSS icon"><span class="stack-fallback">HC</span></span>
+      <span class="stack-copy"><b>HTML / CSS</b><small>interfaces · responsive</small></span>
+    </button>
+<button class="stack-chip" data-stack="Flask" data-category="backend" type="button">
+      <span class="stack-icon-wrap"><img class="stack-logo" loading="lazy" src="/assets/tech-icons/flask.svg" alt="Flask icon"><span class="stack-fallback">F</span></span>
+      <span class="stack-copy"><b>Flask</b><small>python · web</small></span>
+    </button>
+<button class="stack-chip" data-stack="Pandas" data-category="data" type="button">
+      <span class="stack-icon-wrap"><img class="stack-logo" loading="lazy" src="/assets/tech-icons/pandas.svg" alt="Pandas icon"><span class="stack-fallback">P</span></span>
+      <span class="stack-copy"><b>Pandas</b><small>data · reports</small></span>
+    </button>
+<button class="stack-chip" data-stack="Git / GitHub" data-category="tools" type="button">
+      <span class="stack-icon-wrap"><img class="stack-logo" loading="lazy" src="/assets/tech-icons/git.svg" alt="Git / GitHub icon"><span class="stack-fallback">GG</span></span>
+      <span class="stack-copy"><b>Git / GitHub</b><small>versioning · collaboration</small></span>
+    </button>
+<button class="stack-chip" data-stack="PostgreSQL" data-category="data" type="button">
+      <span class="stack-icon-wrap"><img class="stack-logo" loading="lazy" src="/assets/tech-icons/postgresql.svg" alt="PostgreSQL icon"><span class="stack-fallback">P</span></span>
+      <span class="stack-copy"><b>PostgreSQL</b><small>relational database</small></span>
+    </button>
+<button class="stack-chip" data-stack="REST APIs" data-category="backend" type="button">
+      <span class="stack-icon-wrap"><img class="stack-logo" loading="lazy" src="/assets/tech-icons/rest.svg" alt="REST APIs icon"><span class="stack-fallback">RA</span></span>
+      <span class="stack-copy"><b>REST APIs</b><small>integration · services</small></span>
+    </button>
+<button class="stack-chip" data-stack="Jetpack Compose" data-category="mobile" type="button">
+      <span class="stack-icon-wrap"><img class="stack-logo" loading="lazy" src="/assets/tech-icons/compose.svg" alt="Jetpack Compose icon"><span class="stack-fallback">JC</span></span>
+      <span class="stack-copy"><b>Jetpack Compose</b><small>android · ui</small></span>
+    </button>
+<button class="stack-chip" data-stack="Tkinter" data-category="tools" type="button">
+      <span class="stack-icon-wrap"><img class="stack-logo" loading="lazy" src="/assets/tech-icons/tkinter.svg" alt="Tkinter icon"><span class="stack-fallback">T</span></span>
+      <span class="stack-copy"><b>Tkinter</b><small>desktop · python</small></span>
+    </button>
+<button class="stack-chip" data-stack="JSON" data-category="backend" type="button">
+      <span class="stack-icon-wrap"><img class="stack-logo" loading="lazy" src="/assets/tech-icons/json.svg" alt="JSON icon"><span class="stack-fallback">J</span></span>
+      <span class="stack-copy"><b>JSON</b><small>exchange · persistence</small></span>
+    </button>
+<button class="stack-chip" data-stack="Linux" data-category="security" type="button">
+      <span class="stack-icon-wrap"><img class="stack-logo" loading="lazy" src="/assets/tech-icons/linux.svg" alt="Linux icon"><span class="stack-fallback">L</span></span>
+      <span class="stack-copy"><b>Linux</b><small>security fundamentals</small></span>
+    </button>
+<button class="stack-chip" data-stack="Docker" data-category="tools" type="button">
+      <span class="stack-icon-wrap"><img class="stack-logo" loading="lazy" src="/assets/tech-icons/docker.svg" alt="Docker icon"><span class="stack-fallback">D</span></span>
+      <span class="stack-copy"><b>Docker</b><small>container fundamentals</small></span>
+    </button>
+<button class="stack-chip" data-stack="Power BI" data-category="data" type="button">
+      <span class="stack-icon-wrap"><img class="stack-logo" loading="lazy" src="/assets/tech-icons/powerbi.svg" alt="Power BI icon"><span class="stack-fallback">PB</span></span>
+      <span class="stack-copy"><b>Power BI</b><small>analysis · dashboard</small></span>
+    </button>
+<button class="stack-chip" data-stack="Photoshop" data-category="creative" type="button">
+      <span class="stack-icon-wrap"><img class="stack-logo" loading="lazy" src="/assets/tech-icons/photoshop.svg" alt="Photoshop icon"><span class="stack-fallback">P</span></span>
+      <span class="stack-copy"><b>Photoshop</b><small>creative · visual</small></span>
+    </button>
+<button class="stack-chip" data-stack="Node.js" data-category="backend" type="button">
+      <span class="stack-icon-wrap"><img class="stack-logo" loading="lazy" src="/assets/tech-icons/node.svg" alt="Node.js icon"><span class="stack-fallback">N</span></span>
+      <span class="stack-copy"><b>Node.js</b><small>javascript · backend</small></span>
+    </button>
+<button class="stack-chip" data-stack="TypeScript" data-category="web" type="button">
+      <span class="stack-icon-wrap"><img class="stack-logo" loading="lazy" src="/assets/tech-icons/typescript.svg" alt="TypeScript icon"><span class="stack-fallback">T</span></span>
+      <span class="stack-copy"><b>TypeScript</b><small>typed javascript · web</small></span>
+    </button>
+<button class="stack-chip" data-stack="C++" data-category="backend" type="button">
+      <span class="stack-icon-wrap"><img class="stack-logo" loading="lazy" src="/assets/tech-icons/cpp.svg" alt="C++ icon"><span class="stack-fallback">C</span></span>
+      <span class="stack-copy"><b>C++</b><small>algorithms · fundamentals</small></span>
+    </button>
+<button class="stack-chip" data-stack="Figma" data-category="creative" type="button">
+      <span class="stack-icon-wrap"><img class="stack-logo" loading="lazy" src="/assets/tech-icons/figma.svg" alt="Figma icon"><span class="stack-fallback">F</span></span>
+      <span class="stack-copy"><b>Figma</b><small>ui · prototyping</small></span>
+    </button>
+<button class="stack-chip" data-stack="Nmap" data-category="security" type="button">
+      <span class="stack-icon-wrap"><img class="stack-logo" loading="lazy" src="/assets/tech-icons/nmap.svg" alt="Nmap icon"><span class="stack-fallback">N</span></span>
+      <span class="stack-copy"><b>Nmap</b><small>network study</small></span>
+    </button>
+<button class="stack-chip" data-stack="OWASP" data-category="security" type="button">
+      <span class="stack-icon-wrap"><img class="stack-logo" loading="lazy" src="/assets/tech-icons/owasp.svg" alt="OWASP icon"><span class="stack-fallback">O</span></span>
+      <span class="stack-copy"><b>OWASP</b><small>secure development</small></span>
+    </button>
+</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================= 06 / SEGURANÇA ========================= -->
+    <section id="seguranca" class="section section-security" data-tone="amber">
+      <div class="container">
+        <div class="section-head reveal">
+          <div class="eyebrow"><span></span><span data-i18n="security.eyebrow">06 / SEGURANÇA</span></div>
+          <h2 class="crash-title" data-i18n-html="security.title">Quando o sistema<br>precisa <em class="crash-accent">ser confiável.</em></h2>
+          <p data-i18n="security.subtitle">Interesse em segurança da informação, redes e boas práticas aplicadas ao desenvolvimento.</p>
+        </div>
+        <div class="security-grid">
+          <article class="security-card reveal"><span class="security-number mono">01</span><h3 class="crash-target" data-i18n="security.c1.title">Redes</h3><p data-i18n="security.c1.text">Fundamentos de TCP/IP, DNS, HTTP/S, conectividade e troubleshooting.</p><span class="mono">TCP/IP · DNS · HTTP/S</span></article>
+          <article class="security-card reveal reveal-delay-1"><span class="security-number mono">02</span><h3 class="crash-target" data-i18n="security.c2.title">Segurança de aplicações</h3><p data-i18n="security.c2.text">Estudos sobre autenticação, controle de acesso, tratamento de erros, logs e princípios de proteção.</p><span class="mono">AUTH · ACCESS · LOGS</span></article>
+          <article class="security-card reveal"><span class="security-number mono">03</span><h3 class="crash-target" data-i18n="security.c3.title">Automação defensiva</h3><p data-i18n="security.c3.text">Uso de scripts e integrações para reduzir tarefas manuais e tornar processos repetíveis.</p><span class="mono">PYTHON · APIS · ERRORS</span></article>
+        </div>
+        <div class="security-terminal reveal">
+          <div class="terminal-top mono"><span>● ● ●</span><span>fabiano@security:~$</span></div>
+          <div class="terminal-body" id="security-output"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================= 07 / LABORATÓRIO ========================= -->
+    <section id="laboratorio" class="section section-lab" data-tone="lime">
+      <div class="container">
+        <div class="section-head reveal">
+          <div class="eyebrow"><span></span><span data-i18n="lab.eyebrow">07 / LABORATÓRIO</span></div>
+          <h2 class="crash-title" data-i18n-html="lab.title">Projetos e automações<br>no mesmo <em class="crash-accent">lugar.</em></h2>
+          <p data-i18n="lab.subtitle">Uma bancada interativa onde cada estação tem seu próprio fluxo, função e detalhamento.</p>
+        </div>
+        <div class="lab-stack reveal" id="lab-track">
+          <form class="lab-card-v8" id="fake-form">
+            <div class="lab-v8-index">01</div><div class="lab-v8-main"><div class="lab-head"><span class="mono">RUN 01 / FAKER · XLSX</span></div><h3 class="crash-target" data-i18n="lab.faker.title">Gerador de dados para teste</h3><p data-i18n="lab.faker.text">Cria dados sintéticos e organiza tudo em Excel para testes e protótipos.</p><label><span class="mono" data-i18n="lab.quantity">QUANTIDADE</span><input name="quantidade" type="number" min="1" max="100" value="10"></label><div class="lab-actions"><button class="btn btn-primary" type="submit" data-i18n="lab.generate">GERAR XLSX ↗</button><button class="lab-detail-toggle" type="button" data-lab-detail="labd1" data-i18n="lab.details">VER DETALHES +</button></div><div class="lab-detail-v8" id="labd1" data-i18n="lab.d1">Gera dados sintéticos, organiza em XLSX e baixa pelo endpoint Flask. Útil para testes, protótipos e demonstrações.</div><output id="fake-status" class="form-status" aria-live="polite"></output></div>
+          </form>
+          <form class="lab-card-v8" id="automation-form">
+            <div class="lab-v8-index">02</div><div class="lab-v8-main"><div class="lab-head"><span class="mono">RUN 02 / API + EMAIL</span></div><h3 class="crash-target" data-i18n="lab.api.title">Automação por API</h3><p data-i18n="lab.api.text">Consulta uma API compatível, processa os dados e encaminha o resultado por e-mail.</p><div class="lab-form-grid"><input name="nome" placeholder="Seu nome" required data-i18n-placeholder="contact.name"><input name="email" type="email" placeholder="seu@email.com" required data-i18n-placeholder="contact.email"><input name="whatsapp" placeholder="WhatsApp (opcional)" data-i18n-placeholder="lab.whatsapp"><input name="api_url" placeholder="URL da API (opcional)" data-i18n-placeholder="lab.apiUrl"><input name="quantidade" type="number" min="1" max="100" value="10"></div><div class="lab-actions"><button class="btn btn-ghost" type="submit" data-i18n="lab.run">EXECUTAR AUTOMAÇÃO ↗</button><button class="lab-detail-toggle" type="button" data-lab-detail="labd2" data-i18n="lab.details">VER DETALHES +</button></div><div class="lab-detail-v8" id="labd2" data-i18n="lab.d2">Seleciona uma API e envia os dados para o fluxo /executar, que processa e devolve o resultado.</div><output id="automation-status" class="form-status" aria-live="polite"></output></div>
+          </form>
+          <form class="lab-card-v8" id="bot-form">
+            <div class="lab-v8-index">03</div><div class="lab-v8-main"><div class="lab-head"><span class="mono">RUN 03 / SOCIAL</span></div><h3 class="crash-target" data-i18n="lab.bot.title">Bot de conteúdo</h3><p data-i18n="lab.bot.text">Prepara uma mensagem e encaminha para integrações disponíveis.</p><div class="lab-form-grid"><select name="plataforma"><option value="telegram">Telegram</option><option value="facebook">Facebook</option><option value="instagram">Instagram</option><option value="whatsapp">WhatsApp</option></select><input name="nome" placeholder="Nome (opcional)" data-i18n-placeholder="lab.optionalName"><input name="email" type="email" placeholder="E-mail (opcional)" data-i18n-placeholder="lab.optionalEmail"><textarea name="mensagem" rows="4" placeholder="Mensagem" data-i18n-placeholder="lab.message"></textarea></div><div class="lab-actions"><button class="btn btn-ghost" type="submit" data-i18n="lab.send">ENVIAR MENSAGEM ↗</button><button class="lab-detail-toggle" type="button" data-lab-detail="labd3" data-i18n="lab.details">VER DETALHES +</button></div><div class="lab-detail-v8" id="labd3" data-i18n="lab.d3">Prepara a mensagem e chama /executar-bot. A integração real depende das credenciais oficiais da plataforma.</div><output id="bot-status" class="form-status" aria-live="polite"></output></div>
+          </form>
+          <article class="lab-card-v8 info"><div class="lab-v8-index">04</div><div class="lab-v8-main"><div class="lab-head"><span class="mono">RUN 04 / DATA FLOW</span></div><h3 class="crash-target" data-i18n="lab.flow.title">Pipeline de dados</h3><p data-i18n="lab.flow.text">Estudo aplicado em coleta, tratamento, validação e exportação de dados.</p><div class="lab-actions"><button class="lab-detail-toggle" type="button" data-lab-detail="labd4" data-i18n="lab.details">VER DETALHES +</button></div><div class="lab-detail-v8" id="labd4" data-i18n="lab.d4">Base de ETL leve: entrada → tratamento → validação → saída, conectando APIs, Pandas e arquivos.</div></div></article>
+          <article class="lab-card-v8 info"><div class="lab-v8-index">05</div><div class="lab-v8-main"><div class="lab-head"><span class="mono">RUN 05 / SECURE FLOW</span></div><h3 class="crash-target" data-i18n="lab.secure.title">Automação defensiva</h3><p data-i18n="lab.secure.text">Estudo de como reduzir tarefas repetitivas preservando rastreabilidade e segurança.</p><div class="lab-actions"><button class="lab-detail-toggle" type="button" data-lab-detail="labd5" data-i18n="lab.details">VER DETALHES +</button></div><div class="lab-detail-v8" id="labd5" data-i18n="lab.d5">Logs, validação de entrada, controle de acesso e tratamento de erros usados como base para automações previsíveis.</div></div></article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================= 08 / CONTATO ========================= -->
+    <section id="contato" class="section section-contact" data-tone="red">
+      <div class="container">
+        <div class="section-head reveal">
+          <div class="eyebrow"><span></span><span data-i18n="contact.eyebrow">08 / CONTATO</span></div>
+          <h2 class="crash-title" data-i18n-html="contact.title">Vamos transformar<br>uma ideia em <em class="crash-accent">próximo passo.</em></h2>
+          <p data-i18n="contact.subtitle">Para estágio, projeto, colaboração ou conversa sobre tecnologia.</p>
+        </div>
+        <div class="contact-form-shell reveal">
+          <form class="contact-form-v8" id="contact-form">
+            <div class="form-line"><span class="mono">01</span><input name="nome" placeholder="Seu nome" required data-i18n-placeholder="contact.name"></div>
+            <div class="form-line"><span class="mono">02</span><input name="email" type="email" placeholder="seu@email.com" required data-i18n-placeholder="contact.email"></div>
+            <div class="form-line"><span class="mono">03</span><input name="assunto" placeholder="Assunto" data-i18n-placeholder="contact.subject"></div>
+            <div class="form-line form-line-message"><span class="mono">04</span><textarea name="mensagem" rows="7" placeholder="Mensagem" required data-i18n-placeholder="contact.message"></textarea></div>
+            <div class="form-submit-row"><button class="btn btn-primary" type="submit" data-i18n="contact.send">ENVIAR MENSAGEM →</button><output id="contact-status" class="form-status" aria-live="polite"></output></div>
+            <small class="mono" data-i18n="contact.note">O formulário abre seu cliente de e-mail. Nenhum dado é enviado automaticamente sem sua ação.</small>
+          </form>
+        </div>
+        <div class="social-section-v8 reveal" id="socials">
+          <div class="social-head"><span class="eyebrow"><span></span><span data-i18n="contact.socials">REDES / LINKS</span></span><span class="mono">EXTERNAL CHANNELS</span></div>
+          <div class="socials-v8">
+            <a class="social-v8 linkedin" href="https://www.linkedin.com/in/fabiano-santos-96a72a37a" target="_blank" rel="noreferrer"><span class="social-icon-real"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.2 8.5H2.9V21h3.3V8.5ZM4.55 2.5a2 2 0 1 0 0 4 2 2 0 0 0 0-4ZM21.1 13.7c0-3.7-2-5.6-4.7-5.6-2.2 0-3.2 1.2-3.8 2V8.4H9.3V21h3.3v-6.2c0-1.7.3-3.4 2.4-3.4 2.1 0 2.1 2 2.1 3.5V21h3.4v-7.3Z" fill="currentColor"/></svg></span><span>LinkedIn</span><b>↗</b></a>
+            <a class="social-v8 github" href="https://github.com/Fabiano-Santos01" target="_blank" rel="noreferrer"><span class="social-icon-real"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6a9.7 9.7 0 0 0-3.1 18.9c.5.1.7-.2.7-.5v-1.8c-2.8.6-3.4-1.2-3.4-1.2-.5-1.1-1.1-1.4-1.1-1.4-.9-.6.1-.6.1-.6 1 0 1.5 1 1.5 1 .9 1.5 2.3 1.1 2.9.8.1-.6.3-1.1.6-1.3-2.2-.3-4.5-1.1-4.5-4.9 0-1.1.4-2.1 1-2.8-.1-.3-.4-1.3.1-2.8 0 0 .8-.3 2.9 1.1A9.7 9.7 0 0 1 12 8c.8 0 1.7.1 2.5.4 2-1.4 2.8-1.1 2.8-1.1.5 1.5.2 2.5.1 2.8.6.7 1 1.7 1 2.8 0 3.8-2.3 4.6-4.5 4.9.3.3.6.9.6 1.8v2.5c0 .3.2.6.7.5A9.7 9.7 0 0 0 12 2.6Z" fill="currentColor"/></svg></span><span>GitHub</span><b>↗</b></a>
+            <a class="social-v8 whatsapp" href="https://wa.me/5511972307705" target="_blank" rel="noreferrer"><span class="social-icon-real"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 3.6A9.8 9.8 0 0 0 4.9 17l-1 4.1 4.2-1.1a9.8 9.8 0 0 0 12.4-16.4ZM12 19a7 7 0 0 1-3.5-.9l-.3-.2-2.5.7.7-2.4-.2-.4A7 7 0 1 1 12 19Z" fill="currentColor"/><path d="M15.8 13.6c-.2-.1-1.2-.6-1.4-.7-.2-.1-.3-.1-.4.1l-.7.9c-.1.2-.2.2-.4.1-1.4-.7-2.2-1.3-3.1-2.9-.2-.3.2-.3.5-1 .1-.2 0-.3 0-.4l-.5-1.2c-.1-.3-.3-.3-.5-.3h-.4c-.2 0-.4.1-.6.3-.2.3-.8.8-.8 2s.8 2.3.9 2.4c.1.2 1.6 2.5 3.8 3.4.5.2.9.3 1.2.4.5.1 1 .1 1.3.1.4 0 1.2-.5 1.4-.9.2-.4.2-.8.1-.9Z" fill="currentColor"/></svg></span><span>WhatsApp</span><b>↗</b></a>
+            <a class="social-v8 instagram" href="#" data-configurable="instagram"><span class="social-icon-real"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17" cy="7" r="1" fill="currentColor"/></svg></span><span>Instagram</span><b>↗</b></a>
+            <a class="social-v8 facebook" href="#" data-configurable="facebook"><span class="social-icon-real"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 21v-8h3l.5-3H14V8.4c0-.9.3-1.5 1.6-1.5h2V4.2c-.4-.1-1.3-.2-2.5-.2-2.5 0-4.1 1.5-4.1 4.2V10H8v3h3v8h3Z" fill="currentColor"/></svg></span><span>Facebook</span><b>↗</b></a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================= 09 / FOOTER CORPORATIVO ========================= -->
+  <footer class="site-footer" id="site-footer">
+    <div class="container footer-grid">
+      <div>
+        <div class="footer-brand"><span class="brand-symbol">✦</span> FABIANO<span style="color:var(--accent-2)">.DEV</span></div>
+        <p data-i18n="footer.tagline">Construindo com curiosidade, prática e uma quantidade questionável de café.</p>
+      </div>
+      <div>
+        <span class="footer-label" data-i18n="footer.nav">NAVEGAÇÃO</span>
+        <a href="#inicio" data-i18n="nav.home">INÍCIO</a>
+        <a href="#projetos" data-i18n="nav.projects">PROJETOS</a>
+        <a href="#contato" data-i18n="nav.contact">CONTATO</a>
+      </div>
+      <div>
+        <span class="footer-label" data-i18n="footer.status">STATUS</span>
+        <span>OPEN TO WORK</span>
+        <span>BACKEND · AUTOMATION · SECURITY</span>
+        <span>© <b id="current-year"></b> FABIANO DA COSTA SANTOS</span>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <span data-i18n="footer.rights">Todos os direitos reservados.</span>
+      <button id="back-top" type="button">↑ TOP</button>
+    </div>
+  </footer>
+
+  <!-- ========================= MODAL DE PROJETO ========================= -->
+  <dialog class="project-modal" id="project-modal">
+    <div class="modal-head"><span class="mono" id="modal-kicker">PROJECT / 01</span><button id="modal-close" aria-label="Fechar">×</button></div>
+    <div class="modal-body"><span class="mono" id="modal-tech"></span><h3 id="modal-title"></h3><p id="modal-summary"></p><div class="modal-detail" id="modal-detail"></div><div class="modal-actions"><a class="btn btn-primary" id="modal-link" href="#" target="_blank" rel="noreferrer">ABRIR / DOWNLOAD ↗</a><button class="btn btn-ghost" id="modal-dismiss">FECHAR</button></div></div>
+  </dialog>
+
+  <!-- ========================= FABIANO AI ========================= -->
+  <aside class="ai-shell" id="ai-shell" aria-live="polite">
+    <button class="ai-launcher" id="ai-launcher" aria-label="Abrir Fabiano AI">
+      <img class="ai-avatar-image" src="/assets/fabiano-ai-avatar.svg" alt="" aria-hidden="true">
+      <span class="ai-pulse"></span>
+    </button>
+    <section class="ai-panel" id="ai-panel" aria-label="Fabiano AI">
+      <header class="ai-header">
+        <div class="ai-avatar"><img class="ai-avatar-image" src="/assets/fabiano-ai-avatar.svg" alt="" aria-hidden="true"></div>
+        <div><b>FABIANO AI</b><span class="mono" data-i18n="ai.subtitle">ASSISTENTE DO PORTFÓLIO · CONTEXTO DE NEGÓCIO E TECNOLOGIA</span></div>
+        <button id="ai-close" aria-label="Fechar">×</button>
+      </header>
+      <div class="ai-body" id="ai-body"><div class="ai-empty-state" id="ai-empty-state" aria-hidden="true"><span class="ai-empty-mark">↗</span><p data-i18n="ai.empty">PERGUNTE SOBRE PROJETOS, STACK OU JORNADA</p></div></div>
+      <div class="ai-suggestions" id="ai-suggestions"><button data-ai="projects" data-i18n="ai.s1">Quero ver os projetos</button><button data-ai="stack" data-i18n="ai.s2">Quais tecnologias você usa?</button><button data-ai="security" data-i18n="ai.s3">O que você estuda em segurança?</button><button data-ai="contact" data-i18n="ai.s4">Como entrar em contato?</button></div>
+      <form class="ai-form" id="ai-form"><input id="ai-input" autocomplete="off" placeholder="Digite uma pergunta..." data-i18n-placeholder="ai.placeholder"><button aria-label="Enviar">↗</button></form>
+    </section>
+  </aside>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="/site-config.js"></script>
+  <script src="/script.js" defer></script>
 </body>
 </html>

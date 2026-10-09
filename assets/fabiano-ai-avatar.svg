@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-label="Fabiano AI robot avatar">
+  <defs>
+    <linearGradient id="shell" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1c2617"/><stop offset="1" stop-color="#080b08"/></linearGradient>
+    <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#17261a"/><stop offset="1" stop-color="#0a120d"/></linearGradient>
+  </defs>
+  <!-- TRANSPARENT CANVAS: ONLY THE ROBOT ILLUSTRATION IS DRAWN. -->
+  <circle cx="48" cy="48" r="43" fill="none" stroke="#B8FF1C" stroke-opacity=".82" stroke-width="1.5"/>
+  <path d="M48 8v8M48 80v8M8 48h8M80 48h8" stroke="#6FD800" stroke-width="2" stroke-linecap="round"/>
+  <path d="M42 20h12v8H42z" fill="#B8FF1C"/>
+  <path d="M47 28v7" stroke="#B8FF1C" stroke-width="2"/>
+  <circle cx="48" cy="35" r="3" fill="#B8FF1C"/>
+  <rect x="20" y="34" width="56" height="42" rx="13" fill="url(#shell)" stroke="#B8FF1C" stroke-width="2"/>
+  <rect x="26" y="40" width="44" height="25" rx="8" fill="url(#glass)" stroke="#3b5735" stroke-width="1"/>
+  <rect x="31" y="46" width="12" height="10" rx="4" fill="#B8FF1C"/>
+  <rect x="53" y="46" width="12" height="10" rx="4" fill="#B8FF1C"/>
+  <circle cx="37" cy="50" r="2" fill="#071006"/><circle cx="59" cy="50" r="2" fill="#071006"/>
+  <path d="M40 60h16" stroke="#6FD800" stroke-width="2" stroke-linecap="round"/>
+  <path d="M20 48h-6v11h6M76 48h6v11h-6" fill="none" stroke="#B8FF1C" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M36 76v5h24v-5" fill="none" stroke="#6FD800" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="70" cy="22" r="4" fill="#B8FF1C"/>
+</svg>
