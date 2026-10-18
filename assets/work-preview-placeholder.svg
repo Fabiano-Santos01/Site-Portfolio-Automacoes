@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" role="img" aria-labelledby="title desc">
+  <title id="title">Prévia de um futuro projeto</title>
+  <desc id="desc">Ilustração de uma interface web em um monitor, com blocos de código e gráficos, em tons de dourado e ciano sobre fundo escuro.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#151713"/><stop offset="1" stop-color="#080908"/></linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffd94d"/><stop offset="1" stop-color="#e98b24"/></linearGradient>
+  </defs>
+  <rect width="320" height="320" rx="26" fill="url(#bg)"/>
+  <g opacity=".11" stroke="#d4d7ce" stroke-width="1"><path d="M24 48H296M24 80H296M24 112H296M24 144H296M24 176H296M24 208H296M24 240H296M24 272H296"/><path d="M48 24V296M80 24V296M112 24V296M144 24V296M176 24V296M208 24V296M240 24V296M272 24V296"/></g>
+  <circle cx="262" cy="54" r="25" fill="#ffd94d" opacity=".09"/>
+  <circle cx="262" cy="54" r="13" fill="none" stroke="#ffd94d" stroke-width="1.5" opacity=".65"/>
+  <text x="27" y="39" fill="#d5d6cf" font-family="monospace" font-size="9" letter-spacing="2">PROJECT / PREVIEW</text>
+  <rect x="35" y="66" width="250" height="171" rx="12" fill="#080a08" stroke="#696d61" stroke-width="1.5"/>
+  <path d="M35 88H285" stroke="#51564d"/>
+  <circle cx="49" cy="77" r="3" fill="#f36b54"/><circle cx="60" cy="77" r="3" fill="#ffd94d"/><circle cx="71" cy="77" r="3" fill="#73c7b2"/>
+  <rect x="48" y="101" width="65" height="121" rx="5" fill="#161a15" stroke="#292f27"/>
+  <rect x="58" y="112" width="35" height="5" rx="2" fill="#ffd94d" opacity=".9"/><rect x="58" y="125" width="43" height="3" rx="1.5" fill="#9ba49a" opacity=".65"/><rect x="58" y="135" width="31" height="3" rx="1.5" fill="#9ba49a" opacity=".45"/>
+  <rect x="58" y="153" width="42" height="17" rx="4" fill="#f4b83e" opacity=".18" stroke="#f4b83e" stroke-opacity=".65"/><rect x="64" y="160" width="28" height="3" rx="1.5" fill="#ffd94d"/>
+  <rect x="126" y="101" width="145" height="52" rx="5" fill="#121712" stroke="#2d352c"/>
+  <rect x="138" y="112" width="53" height="4" rx="2" fill="#ffd94d"/><rect x="138" y="123" width="87" height="3" rx="1.5" fill="#8f9a8b"/><rect x="138" y="133" width="71" height="3" rx="1.5" fill="#61c8ba" opacity=".85"/>
+  <rect x="126" y="163" width="69" height="59" rx="5" fill="#121712" stroke="#2d352c"/><rect x="206" y="163" width="65" height="59" rx="5" fill="#121712" stroke="#2d352c"/>
+  <path d="M137 207V194H149V185H161V192H173V176H184" fill="none" stroke="url(#gold)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="218" y="195" width="8" height="17" rx="2" fill="#61c8ba"/><rect x="230" y="184" width="8" height="28" rx="2" fill="#ffd94d"/><rect x="242" y="176" width="8" height="36" rx="2" fill="#e98b24"/><rect x="254" y="188" width="8" height="24" rx="2" fill="#61c8ba" opacity=".85"/>
+  <path d="M24 245H296" stroke="#ffd94d" stroke-opacity=".22"/>
+  <path d="M112 237L103 254H217L208 237" fill="#22271f" stroke="#686f61" stroke-width="1.5" stroke-linejoin="round"/>
+  <rect x="129" y="243" width="62" height="4" rx="2" fill="#6b7165"/>
+  <text x="160" y="280" text-anchor="middle" fill="#ffd94d" font-family="monospace" font-size="10" letter-spacing="2">NEXT WORK</text>
+  <text x="160" y="295" text-anchor="middle" fill="#989d92" font-family="monospace" font-size="7" letter-spacing="1.2">REPLACE WITH PROJECT IMAGE</text>
+</svg>

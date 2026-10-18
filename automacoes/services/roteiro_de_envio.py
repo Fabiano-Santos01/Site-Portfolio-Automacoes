@@ -8,8 +8,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
-TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
 
 # ==========================================
@@ -20,16 +18,20 @@ def enviar_telegram(msg):
     """
     Envia uma mensagem para o Telegram usando token e chat_id definidos no .env
     """
-    if not TELEGRAM_TOKEN or not TELEGRAM_CHAT_ID:
+    # Ler o ambiente no momento do envio evita depender da ordem dos imports.
+    load_dotenv()
+    telegram_token = os.getenv("TELEGRAM_TOKEN")
+    telegram_chat_id = os.getenv("TELEGRAM_CHAT_ID")
+    if not telegram_token or not telegram_chat_id:
         return "Erro: TOKEN ou CHAT_ID do Telegram não configurados."
 
     try:
-        url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
+        url = f"https://api.telegram.org/bot{telegram_token}/sendMessage"
 
         resposta = requests.post(
             url,
             data={
-                "chat_id": TELEGRAM_CHAT_ID,
+                "chat_id": telegram_chat_id,
                 "text": msg
             },
             timeout=10
@@ -54,10 +56,7 @@ def enviar_facebook(msg):
     """
     Placeholder para integração futura com Facebook Graph API.
     """
-    return (
-        "Facebook requer configuração da Graph API.\n"
-        "Integração futura planejada."
-    )
+    return "Erro: Facebook não está conectado. Configure um token oficial da Meta e a Graph API antes de usar esta opção."
 
 
 # ==========================================
@@ -68,10 +67,7 @@ def enviar_whatsapp(msg):
     """
     Placeholder para integração futura com WhatsApp Business API / Meta API.
     """
-    return (
-        "WhatsApp requer integração oficial da Meta API.\n"
-        "Integração futura planejada."
-    )
+    return "Erro: WhatsApp não está conectado. Configure a WhatsApp Business Platform oficial antes de usar esta opção."
 
 
 # ==========================================
@@ -82,10 +78,7 @@ def enviar_instagram(msg):
     """
     Placeholder para integração futura com Instagram via Meta Developers.
     """
-    return (
-        "Instagram exige autenticação avançada via Meta Developers.\n"
-        "Integração futura planejada."
-    )
+    return "Erro: Instagram não está conectado. Configure um app e token oficial da Meta antes de usar esta opção."
 
 
 # ==========================================

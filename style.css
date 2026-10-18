@@ -248,8 +248,14 @@ html.theme-light .project-card{background:rgba(255,255,255,.56);border-color:rgb
 .project-card.hidden{display:none}
 .work-feature{display:grid;grid-template-columns:120px minmax(0,1fr);gap:28px;align-items:center;padding:30px;border:1px solid var(--surface-border);border-radius:30px;background:var(--surface);box-shadow:0 22px 60px rgba(0,0,0,.14)}
 .work-mark{width:120px;height:120px;border:1px solid var(--surface-border);display:grid;place-items:center;font:800 38px "Space Grotesk";border-radius:26px;color:var(--accent);background:var(--surface-soft)}
+.work-mark-image{padding:5px;overflow:hidden;background:#050605}
+.work-mark-image img{display:block;width:100%;height:100%;object-fit:contain;border-radius:21px}
 .work-feature h3{margin:13px 0;font:800 34px/1.05 "Space Grotesk"}
-.work-feature p{color:color-mix(in srgb,var(--section-text) 78%,transparent);font-size:16px;max-width:720px}.future-work{margin-top:16px;padding:18px 20px;border:1px dashed var(--surface-border);border-radius:18px;background:var(--surface)}.future-work p{margin:.6rem 0 0;color:color-mix(in srgb,var(--section-text) 76%,transparent)}
+.work-feature p{color:color-mix(in srgb,var(--section-text) 78%,transparent);font-size:16px;max-width:720px}
+.work-feature-template{margin-top:16px;border-style:dashed;box-shadow:none;background:color-mix(in srgb,var(--surface) 72%,transparent)}
+.work-feature-template .work-mark-template{background:#0b0d0a;border-style:dashed}
+.work-feature-template .work-template-link{pointer-events:none;opacity:.62;cursor:default}
+.future-work{margin-top:16px;padding:18px 20px;border:1px dashed var(--surface-border);border-radius:18px;background:var(--surface)}.future-work p{margin:.6rem 0 0;color:color-mix(in srgb,var(--section-text) 76%,transparent)}
 
 /* ============================================================================
    STACK
@@ -265,6 +271,8 @@ html.theme-light .project-card{background:rgba(255,255,255,.56);border-color:rgb
 .stack-chip:hover,.stack-chip.active{background:color-mix(in srgb,var(--accent) 12%,transparent);transform:translateY(-2px)}
 .stack-icon-wrap{width:46px;height:46px;display:grid;place-items:center;border:1px solid color-mix(in srgb,var(--accent) 48%,transparent);border-radius:10px;background:var(--surface-soft);overflow:hidden}
 .stack-logo{width:32px;height:32px;display:block;object-fit:contain}
+.stack-icon-pair{display:flex;align-items:center;justify-content:center;gap:2px;width:100%;height:100%}
+.stack-logo-pair{width:22px;height:22px;flex:0 0 22px}
 .stack-fallback{display:none}
 .stack-copy{min-width:0;display:flex;flex-direction:column}
 .stack-copy b{font:800 14px/1.2 "Space Grotesk";color:var(--section-text)}.stack-copy small{margin-top:4px;color:var(--muted);font:700 8px/1.3 "DM Mono"}

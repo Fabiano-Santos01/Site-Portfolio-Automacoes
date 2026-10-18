@@ -1,3 +1,9 @@
 venv/
 __pycache__/
+*.pyc
 .env
+*.xlsx
+relatorios/
+dados_processados.csv
+dados_falsos_organizados.csv
+dados_falsos_organizados.xlsx

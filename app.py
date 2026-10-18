@@ -1,583 +1,222 @@
 import os
-import requests
-
+import re
+import shutil
 from datetime import datetime
+from pathlib import Path
+from uuid import uuid4
 
+from flask import Flask, jsonify, redirect, render_template, request, send_file, send_from_directory, url_for
 from flask_cors import CORS
-
-from flask import (
-    Flask,
-    render_template,
-    request,
-    send_file,
-    jsonify
-)
-
 from dotenv import load_dotenv
 
-from automacoes.main_unificado import (
-    gerar_dados_falsos_csv
-)
+from automacoes.main_unificado import gerar_dados_falsos_csv
+from automacoes.services.api_service import processar_api
+from automacoes.services.email_service import enviar_email, gerar_mensagem
+from automacoes.services.roteiro_de_envio import enviar_para_rede
+from automacoes.services.report_service import gerar_relatorio_xlsx
 
-from automacoes.services.email_service import (
-    enviar_email,
-    gerar_mensagem
-)
+# ========================= CONFIGURAÇÃO PRINCIPAL =========================
+BASE_DIR = Path(__file__).resolve().parent
+load_dotenv(BASE_DIR / '.env')
 
-from automacoes.services.api_service import (
-    processar_api
-)
-
-from automacoes.services.roteiro_de_envio import (
-    enviar_para_rede
-)
-
-# ==========================================
-# CARREGAR .ENV
-# ==========================================
-
-load_dotenv()
-
-# ==========================================
-# CONFIG FLASK
-# ==========================================
-
-app = Flask(
-    __name__,
-    template_folder='.',
-    static_url_path='',
-    static_folder='.'
-)
-
+app = Flask(__name__, template_folder=str(BASE_DIR), static_folder=str(BASE_DIR), static_url_path='')
 CORS(app)
 
-# ==========================================
-# HELPERS
-# ==========================================
+MAX_NAME = 120
+MAX_EMAIL = 180
+MAX_MESSAGE = 4000
+REPORTS_DIR = BASE_DIR / 'relatorios'
+REPORTS_DIR.mkdir(exist_ok=True)
 
-def coletar_contexto_requisicao():
-    ip = request.headers.get("X-Forwarded-For", request.remote_addr or "desconhecido")
-    if "," in ip:
-        ip = ip.split(",")[0].strip()
+# ========================= HELPERS / VALIDAÇÃO =========================
+def clean_text(value, limit=500):
+    return str(value or '').strip()[:limit]
 
-    ua = request.headers.get("User-Agent", "desconhecido")
 
-    sistema = "Desconhecido"
-    if "Windows" in ua:
-        sistema = "Windows"
-    elif "Android" in ua:
-        sistema = "Android"
-    elif "iPhone" in ua or "iPad" in ua:
-        sistema = "iPhone/iPad"
-    elif "Mac OS X" in ua or "Macintosh" in ua:
-        sistema = "macOS"
-    elif "Linux" in ua:
-        sistema = "Linux"
+def valid_email(value):
+    return bool(re.fullmatch(r"[^\s@]+@[^\s@]+\.[^\s@]+", value or ''))
 
-    navegador = "Desconhecido"
-    if "Chrome" in ua and "Edg" not in ua and "OPR" not in ua:
-        navegador = "Chrome"
-    elif "Edg" in ua:
-        navegador = "Edge"
-    elif "Firefox" in ua:
-        navegador = "Firefox"
-    elif "Safari" in ua and "Chrome" not in ua:
-        navegador = "Safari"
 
-    dispositivo = "Mobile" if any(x in ua for x in ["Mobile", "Android", "iPhone", "iPad"]) else "Desktop"
+def request_context():
+    ua = request.headers.get('User-Agent', '')
+    forwarded = request.headers.get('X-Forwarded-For', request.remote_addr or 'unknown')
+    ip = forwarded.split(',')[0].strip()
+    if 'Windows' in ua: system = 'Windows'
+    elif 'Android' in ua: system = 'Android'
+    elif 'iPhone' in ua or 'iPad' in ua: system = 'iOS'
+    elif 'Mac' in ua: system = 'macOS'
+    elif 'Linux' in ua: system = 'Linux'
+    else: system = 'Unknown'
+    device = 'Mobile' if any(k in ua for k in ('Mobile','Android','iPhone','iPad')) else 'Desktop'
+    return {'ip': ip, 'system': system, 'device': device, 'user_agent': ua}
 
-    cidade = "Desconhecida"
-    estado = "-"
-    pais = "-"
-    operadora = "-"
 
+def notify_telegram(action, name='', email='', whatsapp='', details=''):
+    ctx = request_context()
+    msg = (
+        'NOVO USO NO PORTFÓLIO\n\n'
+        f'Ação: {action}\n'
+        f'Data/Hora: {datetime.now().strftime("%d/%m/%Y %H:%M:%S")}\n\n'
+        f'Nome: {name or "Não informado"}\n'
+        f'E-mail: {email or "Não informado"}\n'
+        f'WhatsApp: {whatsapp or "Não informado"}\n'
+        f'IP: {ctx["ip"]}\nSistema: {ctx["system"]}\nDispositivo: {ctx["device"]}\n\n{details}'
+    )
     try:
-        resp = requests.get(
-            f"http://ip-api.com/json/{ip}?fields=status,country,regionName,city,isp",
-            timeout=4
-        )
-        geo = resp.json()
-        if geo.get("status") == "success":
-            cidade = geo.get("city", "-")
-            estado = geo.get("regionName", "-")
-            pais = geo.get("country", "-")
-            operadora = geo.get("isp", "-")
-    except Exception:
-        pass
+        enviar_para_rede('telegram', msg)
+    except Exception as exc:
+        app.logger.warning('Falha no aviso Telegram: %s', exc)
 
-    return {
-        "ip": ip,
-        "cidade": cidade,
-        "estado": estado,
-        "pais": pais,
-        "operadora": operadora,
-        "sistema": sistema,
-        "navegador": navegador,
-        "dispositivo": dispositivo,
-        "user_agent": ua
-    }
-
-
-def enviar_aviso_telegram(acao, nome="Não informado", email="Não informado", whatsapp="Não informado", detalhes=""):
-    info = coletar_contexto_requisicao()
-    agora = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-
-    mensagem = f"""
-🚨 NOVO USO NO SITE
-
-Ação: {acao}
-Data/Hora: {agora}
-
-Nome: {nome}
-Email: {email}
-WhatsApp: {whatsapp}
-
-IP: {info["ip"]}
-Local: {info["cidade"]} - {info["estado"]} / {info["pais"]}
-Operadora: {info["operadora"]}
-
-Sistema: {info["sistema"]}
-Navegador: {info["navegador"]}
-Dispositivo: {info["dispositivo"]}
-
-{detalhes}
-""".strip()
-
-    try:
-        enviar_para_rede("telegram", mensagem)
-    except Exception as e:
-        print(f"[ERRO TELEGRAM LOG] {e}")
-
-# ==========================================
-# ROTAS PRINCIPAIS
-# ==========================================
-
+# ========================= ROTAS PRINCIPAIS =========================
 @app.route('/')
 def home():
-
-    return render_template(
-        'index.html'
-    )
-
+    return render_template('index.html')
 
 @app.route('/projetos')
 def projetos():
-
-    return render_template(
-        'projetos.html'
-    )
-
+    return redirect('/#projetos')
 
 @app.route('/automacoes')
 def automacoes():
+    return redirect('/#laboratorio')
 
-    return render_template(
-        'automacoes.html'
-    )
+@app.route('/trabalhos')
+def trabalhos():
+    return redirect('/#trabalhos')
 
-# ==========================================
-# EXECUTAR AUTOMAÇÃO
-# ==========================================
+@app.route('/health')
+def health():
+    return jsonify({'status': 'ok', 'service': 'fabiano-portfolio'})
 
+# ========================= AUTOMAÇÃO / API / E-MAIL =========================
 @app.route('/executar', methods=['POST'])
 def executar():
-
     try:
+        name = clean_text(request.form.get('nome'), MAX_NAME)
+        email = clean_text(request.form.get('email'), MAX_EMAIL)
+        whatsapp = clean_text(request.form.get('whatsapp'), 40)
+        api_url = clean_text(request.form.get('api_url'), 1000)
+        quantity = int(request.form.get('quantidade', 10))
+        if not name:
+            return jsonify({'status': 'erro', 'mensagem': 'Nome obrigatório.'}), 400
+        if not valid_email(email):
+            return jsonify({'status': 'erro', 'mensagem': 'E-mail inválido.'}), 400
+        if not 1 <= quantity <= 100:
+            return jsonify({'status': 'erro', 'mensagem': 'Quantidade deve estar entre 1 e 100.'}), 400
 
-        email = request.form.get(
-            'email'
-        )
-
-        nome = request.form.get(
-            'nome',
-            'Dev'
-        )
-
-        whatsapp = request.form.get("whatsapp", "").strip() or "Não informado"
-
-        api_url = request.form.get(
-            'api_url'
-        )
-
-        quantidade = int(
-            request.form.get(
-                'quantidade',
-                10
-            )
-        )
-
-        # ==================================
-        # VALIDAÇÕES
-        # ==================================
-
-        if not email:
-
-            return jsonify({
-                "status": "erro",
-                "mensagem": (
-                    "E-mail obrigatório."
-                )
-            }), 400
-
-        if not nome:
-
-            return jsonify({
-                "status": "erro",
-                "mensagem": (
-                    "Nome obrigatório."
-                )
-            }), 400
-
-        # ==================================
-        # GERAR CSV E XLSX
-        # ==================================
-
-        arquivo_csv, arquivo_xlsx = gerar_dados_falsos_csv(
-            quantidade
-        )
-
-        arquivo_fake = arquivo_xlsx
-
-        # ==================================
-        # GERAR MENSAGEM
-        # ==================================
-
-        mensagem = gerar_mensagem(
-            nome
-        )
-
-        # ==================================
-        # PROCESSAR API
-        # ==================================
-
-        arquivo_processado = None
-        dados = []
-
+        processed_file, data = (None, [])
+        api_type = 'default'
         if api_url:
+            processed_file, data = processar_api(api_url, output_dir=BASE_DIR)
+            low = api_url.lower()
+            if 'coingecko' in low:
+                api_type = 'crypto'
+            elif 'ibge' in low:
+                api_type = 'ibge'
+            elif 'picsum' in low:
+                api_type = 'imagem'
+            if not data:
+                return jsonify({
+                    'status': 'erro',
+                    'mensagem': 'A API respondeu, mas nenhum registro compatível foi encontrado. Confira o endpoint e tente novamente.'
+                }), 502
 
-            arquivo_processado, dados = (
-                processar_api(
-                    api_url
-                )
-            )
+        # Sempre gera um XLSX confiável no diretório do projeto, sem depender
+        # da pasta corrente usada para iniciar Flask/Gunicorn.
+        if data:
+            report_path = REPORTS_DIR / f'relatorio_api_{uuid4().hex[:12]}.xlsx'
+            gerar_relatorio_xlsx(data, report_path)
+        else:
+            _, xlsx_path = gerar_dados_falsos_csv(quantity, output_dir=BASE_DIR)
+            report_path = REPORTS_DIR / f'dados_teste_{uuid4().hex[:12]}.xlsx'
+            shutil.copy2(xlsx_path, report_path)
 
-        # ==================================
-        # DETECTAR TIPO DE API
-        # ==================================
-
-        tipo_api = "default"
-
-        if api_url:
-
-            url_lower = api_url.lower()
-
-            if "coingecko" in url_lower:
-
-                tipo_api = "crypto"
-
-            elif "ibge" in url_lower:
-
-                tipo_api = "ibge"
-
-            elif "picsum" in url_lower:
-
-                tipo_api = "imagem"
-
-        # ==================================
-        # DEFINIR ANEXO
-        # ==================================
-
-        anexo = (
-            arquivo_processado
-            if arquivo_processado
-            else arquivo_fake
-        )
-
-        # ==================================
-        # ENVIAR EMAIL
-        # ==================================
-
-        resultado_email = enviar_email(
-            destinatario=email,
-            mensagem=mensagem,
-            anexo=anexo,
-            dados=dados,
-            tipo_api=tipo_api,
-            nome_usuario=nome
-        )
-
-        print(
-            f"[EMAIL RESULTADO] {resultado_email}"
-        )
-
-        enviar_aviso_telegram(
-            acao="Automação executada",
-            nome=nome,
-            email=email,
-            whatsapp=whatsapp,
-            detalhes=f"Tipo de API: {api_url or 'Não informada'}"
-        )
-
-        # ==================================
-        # VALIDAR RESULTADO
-        # ==================================
-
-        if (
-            not resultado_email
-            or "Erro" in resultado_email
-        ):
-
+        # Sem chave do Resend, o processamento/exportação ainda funciona em modo
+        # local, sem fingir que o e-mail foi enviado.
+        if not os.getenv('RESEND_API_KEY'):
+            notify_telegram('Automação processada (modo sem e-mail)', name, email, whatsapp,
+                            f'API: {api_url or "dados sintéticos"}; registros: {len(data)}')
             return jsonify({
-                "status": "erro",
-                "mensagem": resultado_email
-            }), 500
+                'status': 'parcial',
+                'email_enviado': False,
+                'registros': len(data),
+                'download_url': url_for('download_relatorio', filename=report_path.name),
+                'mensagem': 'Processamento concluído, mas o e-mail não foi enviado: RESEND_API_KEY não está configurada. Baixe o XLSX e configure a chave no ambiente para habilitar o envio.'
+            }), 200
 
-        # ==================================
-        # SUCESSO
-        # ==================================
+        attachment = processed_file or str(report_path)
+        if data:
+            attachment = str(report_path)
+        result = enviar_email(destinatario=email, mensagem=gerar_mensagem(name), anexo=attachment,
+                              dados=data, tipo_api=api_type, nome_usuario=name)
+        if not result or 'Erro' in result:
+            return jsonify({'status': 'erro', 'mensagem': result or 'Falha no envio.'}), 502
+        notify_telegram('Automação executada', name, email, whatsapp, f'API: {api_url or "não informada"}')
+        return jsonify({'status': 'sucesso', 'email_enviado': True, 'registros': len(data),
+                        'download_url': url_for('download_relatorio', filename=report_path.name),
+                        'mensagem': result})
+    except ValueError as exc:
+        message = str(exc) or 'Quantidade inválida.'
+        return jsonify({'status': 'erro', 'mensagem': message}), 400
+    except Exception as exc:
+        if exc.__class__.__module__.startswith('requests'):
+            app.logger.warning('Falha ao consultar API: %s', exc)
+            return jsonify({'status': 'erro', 'mensagem': f'Falha ao consultar a API. Confira a URL e tente novamente. Detalhe: {exc}'}), 502
+        app.logger.exception('Erro em /executar')
+        return jsonify({'status': 'erro', 'mensagem': f'Falha no processamento: {exc}'}), 500
 
-        return jsonify({
-            "status": "sucesso",
-            "mensagem": resultado_email
-        })
-
-    except ValueError:
-
-        return jsonify({
-            "status": "erro",
-            "mensagem": (
-                "Quantidade inválida."
-            )
-        }), 400
-
-    except Exception as erro:
-
-        print(
-            f"[ERRO EXECUTAR] {erro}"
-        )
-
-        return jsonify({
-            "status": "erro",
-            "mensagem": str(erro)
-        }), 500
-
-# ==========================================
-# BOT SOCIAL
-# ==========================================
-
+# ========================= BOT SOCIAL =========================
 @app.route('/executar-bot', methods=['POST'])
 def executar_bot():
-
     try:
+        platform = clean_text(request.form.get('plataforma'), 30).lower()
+        message = clean_text(request.form.get('mensagem'), MAX_MESSAGE)
+        name = clean_text(request.form.get('nome'), MAX_NAME)
+        email = clean_text(request.form.get('email'), MAX_EMAIL)
+        if platform not in {'telegram','facebook','instagram','whatsapp'}:
+            return jsonify({'status':'erro','mensagem':'Plataforma inválida.'}), 400
+        if not message: return jsonify({'status':'erro','mensagem':'Digite uma mensagem.'}), 400
+        if email and not valid_email(email): return jsonify({'status':'erro','mensagem':'E-mail inválido.'}), 400
+        details = f'Nome: {name or "Não informado"}\nE-mail: {email or "Não informado"}\nMensagem: {message}'
+        result = enviar_para_rede(platform, details)
+        if not result or 'Erro' in result: return jsonify({'status':'erro','mensagem':result or 'Falha no envio.'}), 500
+        notify_telegram(f'Bot social: {platform}', name, email, '', details)
+        return jsonify({'status':'sucesso','mensagem':result})
+    except Exception as exc:
+        app.logger.exception('Erro em /executar-bot')
+        return jsonify({'status':'erro','mensagem':str(exc)}), 500
 
-        tipo = request.form.get(
-            "plataforma"
-        )
-
-        mensagem = request.form.get(
-            "mensagem"
-        )
-
-        nome = request.form.get(
-            "nome",
-            ""
-        ).strip() or "Não informado"
-
-        email = request.form.get(
-            "email",
-            ""
-        ).strip() or "Não informado"
-
-        whatsapp = request.form.get("bot_whatsapp", "").strip() or "Não informado"
-
-        # ==================================
-        # CAPTURAR INFORMAÇÕES DO REQUEST
-        # ==================================
-
-        ip = request.headers.get(
-            "X-Forwarded-For",
-            request.remote_addr or "desconhecido"
-        )
-
-        user_agent = request.headers.get(
-            "User-Agent",
-            "desconhecido"
-        )
-
-        agora = datetime.now().strftime(
-            "%d/%m/%Y %H:%M:%S"
-        )
-
-        # ==================================
-        # VALIDAÇÕES
-        # ==================================
-
-        if not tipo:
-
-            return jsonify({
-                "status": "erro",
-                "mensagem": (
-                    "Escolha uma plataforma."
-                )
-            }), 400
-
-        if not mensagem:
-
-            return jsonify({
-                "status": "erro",
-                "mensagem": (
-                    "Digite uma mensagem."
-                )
-            }), 400
-
-        # ==================================
-        # MONTAR MENSAGEM IDENTIFICADA
-        # ==================================
-
-        mensagem_identificada = (
-            f"🧾 Nova solicitação do site\n"
-            f"Nome: {nome}\n"
-            f"E-mail: {email}\n"
-            f"WhatsApp: {whatsapp}\n"
-            f"IP: {ip}\n"
-            f"User-Agent: {user_agent}\n"
-            f"Data: {agora}\n\n"
-            f"Mensagem:\n{mensagem}"
-        )
-
-        # ==================================
-        # EXECUTAR ENVIO
-        # ==================================
-
-        resultado = enviar_para_rede(
-            tipo,
-            mensagem_identificada
-        )
-
-        print(
-            f"[BOT RESULTADO] {resultado}"
-        )
-
-        # ==================================
-        # VALIDAR RESULTADO
-        # ==================================
-
-        if (
-            not resultado
-            or "Erro" in resultado
-        ):
-
-            return jsonify({
-                "status": "erro",
-                "mensagem": resultado
-            }), 500
-
-        # ==================================
-        # SUCESSO
-        # ==================================
-
-        return jsonify({
-            "status": "sucesso",
-            "mensagem": resultado
-        })
-
-    except Exception as erro:
-
-        print(
-            f"[ERRO BOT] {erro}"
-        )
-
-        return jsonify({
-            "status": "erro",
-            "mensagem": str(erro)
-        }), 500
-
-# ==========================================
-# DOWNLOAD CSV
-# ==========================================
-
+# ========================= DOWNLOAD / GERAÇÃO =========================
 @app.route('/download')
 def download():
+    path = BASE_DIR / 'dados_falsos_organizados.xlsx'
+    if not path.exists():
+        return jsonify({'status': 'erro', 'mensagem': 'Gere os dados antes de solicitar o arquivo.'}), 404
+    return send_file(path, as_attachment=True, download_name='dados_falsos_organizados.xlsx')
 
-    nome_arquivo = (
-        'dados_falsos_organizados.xlsx'
-    )
 
-    if not os.path.exists(
-        nome_arquivo
-    ):
+@app.route('/download-relatorio/<path:filename>')
+def download_relatorio(filename):
+    # send_from_directory impede que o nome recebido escape da pasta de relatórios.
+    return send_from_directory(str(REPORTS_DIR), filename, as_attachment=True)
 
-        return jsonify({
-            "status": "erro",
-            "mensagem": (
-                "Arquivo não encontrado."
-            )
-        }), 404
-
-    return send_file(
-        nome_arquivo,
-        as_attachment=True
-    )
-
-# ==========================================
-# GERAR DADOS
-# ==========================================
 
 @app.route('/gerar-dados', methods=['POST'])
 def gerar_dados():
-
     try:
+        quantity = int(request.form.get('quantidade', 10))
+        if not 1 <= quantity <= 100:
+            return jsonify({'status': 'erro', 'mensagem': 'Quantidade deve estar entre 1 e 100.'}), 400
+        _, xlsx_path = gerar_dados_falsos_csv(quantity, output_dir=BASE_DIR)
+        return send_file(xlsx_path, as_attachment=True, download_name='dados_falsos_organizados.xlsx',
+                         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    except ValueError as exc:
+        return jsonify({'status': 'erro', 'mensagem': str(exc) or 'Quantidade inválida.'}), 400
+    except Exception as exc:
+        app.logger.exception('Erro em /gerar-dados')
+        return jsonify({'status': 'erro', 'mensagem': f'Não foi possível gerar o XLSX: {exc}'}), 500
 
-        quantidade = int(
-            request.form.get(
-                'quantidade',
-                10
-            )
-        )
-
-        # ==================================
-        # GERAR CSV
-        # ==================================
-
-        gerar_dados_falsos_csv(
-            quantidade
-        )
-
-        # ==================================
-        # RETORNAR ARQUIVO
-        # ==================================
-
-        return send_file(
-            'dados_falsos_organizados.xlsx',
-            as_attachment=True
-        )
-
-    except ValueError:
-
-        return jsonify({
-            "status": "erro",
-            "mensagem": (
-                "Quantidade inválida."
-            )
-        }), 400
-
-    except Exception as erro:
-
-        print(
-            f"[ERRO GERAR DADOS] {erro}"
-        )
-
-        return jsonify({
-            "status": "erro",
-            "mensagem": str(erro)
-        }), 500
-
-# ==========================================
-# START FLASK
-# ==========================================
-
+# ========================= EXECUÇÃO LOCAL / RENDER =========================
 if __name__ == '__main__':
-
-    app.run(
-        debug=True
-    )
+    port = int(os.getenv('PORT','5000'))
+    app.run(host='0.0.0.0', port=port, debug=os.getenv('FLASK_DEBUG','0') == '1')

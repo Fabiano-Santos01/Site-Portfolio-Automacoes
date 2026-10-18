@@ -57,10 +57,13 @@ def formatar_dados(dados):
         # ==================================
 
         else:
-
-            organizados.append({
-                "Categoria": "Desconhecida",
-                "Dados": str(item)
-            })
+            # APIs como o endpoint de metadados do IBGE podem retornar campos
+            # que não são séries históricas. Preserve esses campos para exportação.
+            registro = {"Categoria": tipo.title() if tipo else "API"}
+            for chave, valor in item.items():
+                if chave == "tipo":
+                    continue
+                registro[str(chave)] = str(valor) if isinstance(valor, (dict, list)) else valor
+            organizados.append(registro)
 
     return organizados

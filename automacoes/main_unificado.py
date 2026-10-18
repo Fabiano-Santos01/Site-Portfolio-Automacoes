@@ -2,6 +2,7 @@
 
 import sys
 import csv
+from pathlib import Path
 from faker import Faker
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment
@@ -14,11 +15,21 @@ def exibir_informacoes_sistema():
     print(f"Python: {sys.version}")
 
 
-def gerar_dados_falsos_csv(quantidade=10):
-    fake = Faker("pt-BR")
+BASE_DIR = Path(__file__).resolve().parents[1]
 
-    nome_csv = "dados_falsos_organizados.csv"
-    nome_xlsx = "dados_falsos_organizados.xlsx"
+
+def gerar_dados_falsos_csv(quantidade=10, output_dir=None):
+    """Gera CSV e XLSX sintéticos em um diretório previsível.
+
+    Retorna caminhos absolutos para que o resultado não dependa da pasta
+    em que o processo Flask/Gunicorn foi iniciado.
+    """
+    fake = Faker("pt-BR")
+    destino = Path(output_dir).resolve() if output_dir else BASE_DIR
+    destino.mkdir(parents=True, exist_ok=True)
+
+    nome_csv = destino / "dados_falsos_organizados.csv"
+    nome_xlsx = destino / "dados_falsos_organizados.xlsx"
 
     campos = [
         "Nome", "Email", "CPF", "RG", "Telefone",
@@ -87,7 +98,7 @@ def gerar_dados_falsos_csv(quantidade=10):
 
     wb.save(nome_xlsx)
 
-    return nome_csv, nome_xlsx
+    return str(nome_csv), str(nome_xlsx)
 
 
 if __name__ == "__main__":
