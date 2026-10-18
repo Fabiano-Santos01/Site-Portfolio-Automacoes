@@ -1,0 +1,26 @@
+{
+  "project": "Fabiano Portfolio Cyberpunk V5",
+  "assets": [
+    "downloads/robo-selic.zip",
+    "downloads/calculadora-unip.apk",
+    "downloads/Tela_A7UL_PY_v1.0_source.zip",
+    "downloads/oficina-manager.zip",
+    "imagem/fabiano-cyber.png",
+    "imagem/foto.jpg",
+    "imagem/fabiano-cyber.webp",
+    "projetos/tela_a7ul/Tela_A7UL_PY_v1.0/docs/screenshots/Menu Tela Azul.png",
+    "projetos/tela_a7ul/Tela_A7UL_PY_v1.0/docs/screenshots/Inventario Tela Azul.png",
+    "projetos/tela_a7ul/Tela_A7UL_PY_v1.0/docs/screenshots/Combate Tela Azul.png"
+  ],
+  "routes": [
+    "/",
+    "/projetos",
+    "/automacoes",
+    "/trabalhos",
+    "/health",
+    "/executar",
+    "/executar-bot",
+    "/download",
+    "/gerar-dados"
+  ]
+}
